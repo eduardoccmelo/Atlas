@@ -15,6 +15,7 @@ export default function TravelMap({
   supercluster,
   clickedCountry,
   setClickedCountry,
+  setMapError,
 }) {
   const navControlStyle = {
     right: 10,
@@ -24,12 +25,13 @@ export default function TravelMap({
   return (
     <ReactMapGl
       {...viewPort}
-      maxZoom={7}
+      maxZoom={12}
       mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_KEY}
-      mapStyle="mapbox://styles/eduardoccmelo/cknt22q320tjn18mug9tx4v89"
+      mapStyle="mapbox://styles/mapbox/outdoors-v12"
       onViewportChange={(viewPort) => {
         setViewPort(viewPort);
       }}
+      onError={() => setMapError(true)}
       ref={mapRef}
     >
       {markers.length > 0 &&
@@ -55,7 +57,7 @@ export default function TravelMap({
                   onClick={() => {
                     const expansionZoom = Math.min(
                       supercluster.getClusterExpansionZoom(cluster.id),
-                      20
+                      12
                     );
                     setViewPort({
                       ...viewPort,

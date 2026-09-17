@@ -1,132 +1,90 @@
 .MyTrips {
-  display: grid;
+  max-width: 860px;
+  margin: 0 auto;
 }
-
-.myTripsButton {
-  margin: 0;
-}
-
 .myTripsHeader {
   display: flex;
   align-items: center;
-  padding: 20px 0 0 16px;
-  margin-left: 25px;
-  z-index: 1;
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
+  justify-content: center;
+  margin: 16px 0 20px;
 }
-
 .myTripsHeader h2 {
-  width: 300px;
-  margin: 3px 0 10px -120px;
-  padding-right: 20px;
-  font-size: 2em;
-  text-align: end;
-  border-radius: 50px;
-  color: white;
-  background-color: rgba(37, 57, 73, 0.95);
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 2px 2px 5px #181212;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  letter-spacing: -0.045em;
 }
-
+.myTripsHeader h2::after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 99px;
+  background: var(--paper);
+}
 .myTripsHeaderButton {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
+  width: fit-content;
+  min-height: 46px;
+  margin: 0 auto 18px;
+  padding: 0 18px;
+  border-radius: 12px;
+  color: #23475a;
   text-decoration: none;
-  width: 60px;
-  height: 60px;
-  margin: 0 0 5px 15px;
-  border-radius: 50px;
-  font-size: 1.3em;
-  color: white;
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 2px 1px 3px #181212;
-  background-color: rgb(47, 116, 83);
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  transition: transform 160ms ease;
 }
-
 .myTripsHeaderButton:hover {
-  transform: rotate(-90deg);
-  transition-duration: 0.2s;
-  scale: 105%;
-  box-shadow: 1px 1px 4px #181212;
+  transform: translateY(-2px);
 }
-
-.myTripsButtonHome {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  margin-right: 6px;
-  padding: 5px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-size: 20px;
-  color: white;
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 2px 2px 5px #181212;
-  background-color: rgb(37, 57, 73);
-}
-
-.myTripsButtonWorldMap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 150px;
-  height: 50px;
-  margin-left: 4px;
-  padding: 15px;
-  font-weight: 700;
-  font-size: 1.1em;
-  text-decoration: none;
-  border-radius: 10px;
-  color: white;
-  box-shadow: 2px 2px 5px #181212;
-  background-color: rgba(37, 57, 73, 0.95);
-  border: solid 2px rgb(255, 255, 255);
-}
-
-.myTripsButtonWorldMap:hover,
-.myTripsButtonHome:hover {
-  scale: 105%;
-}
-
-.myTripsButtonWorldMap i {
-  margin-right: 5px;
-  animation: zoominoutsinglefeatured 1s infinite;
-  margin-bottom: -1px;
-}
-
-.myTripsButtonWorldMap i:hover {
-  transform: rotate(2080deg);
-  transition-duration: 18s;
-}
-
-.noTripsText {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
 .myTripsMain {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 80px;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.noTripsText {
+  margin: 40px auto 80px;
+  padding: 28px;
+  border: 1px dashed rgba(255, 255, 255, 0.7);
+  border-radius: 18px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 1.05rem;
+  text-align: center;
 }
 
-.myTripsFooter {
+.myTripsItem,
+.pastTripItem {
   display: flex;
-  position: fixed;
-  justify-self: end;
-  margin: 20px 15px 20px 0;
-  bottom: 0;
-  right: 0;
+  align-items: center;
+  position: relative;
+  width: 330px;
+  height: 100px;
+  margin: 5px;
+  padding: 5px;
+  justify-content: space-between;
+  border: 2px solid black;
+  border-radius: 10px 0 0 10px;
+  box-shadow: 2px 2px 5px #2e2828;
+  background-color: rgba(216, 241, 241, 0.85);
 }
-
+.pastTripItem {
+  background-color: rgba(216, 241, 241, 0.5);
+}
+.myTripsItem::before,
+.pastTripItem::before {
+  content: none;
+}
 .removeButton {
   height: 90px;
   width: 25px;
@@ -135,38 +93,94 @@
   font-size: 1em;
   border-radius: 7px 0 0 7px;
   background-color: rgb(98, 8, 8);
-  color: white;
+  color: var(--paper);
+}
+.removeButton:hover {
+  background-color: rgb(98, 8, 8);
+}
+.tripCardInfo {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.tripCardInfo i {
+  margin-right: -5px;
 }
 
+.tripStart,
+.tripEnd {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #123847;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.tripStart span,
+.tripEnd span {
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: #fff;
+  background: var(--teal);
+  font-size: 0.65em;
+  font-weight: 850;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.cardDivider {
+  margin-right: 60px;
+  margin-top: 0;
+}
+
+.tripName {
+  margin: 0 130px 0 10px;
+  font-family: inherit;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  color: black;
+  position: relative;
+}
+.tripDates {
+  position: absolute;
+  right: 29.5px;
+  top: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tripDates::before {
+  display: none;
+}
 .tripViewButton {
   height: 35px;
-  width: 56px;
-  font-size: 1em;
+  width: 52px;
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
   cursor: pointer;
   position: absolute;
-  right: 30px;
-  top: 55px;
+  right: 26px;
+  top: 54px;
   text-transform: uppercase;
   border: none;
   color: white;
-  background-color: rgb(0, 78, 0);
+  background-color: var(--teal);
+  border-radius: 12px;
 }
-
-.tripDates {
-  position: absolute;
-  right: 33px;
-  top: 6px;
-  font-size: 20px;
-  line-height: 1.1;
+.tripViewButton:hover {
+  filter: none;
 }
-
-hr {
-  transform: rotate(-90deg);
-  width: 82px;
-  position: absolute;
-  top: 47px;
-}
-
 .barcode {
   transform: rotate(-90deg);
   position: absolute;
@@ -174,154 +188,114 @@ hr {
   top: 35px;
   font-size: 20px;
   color: black;
+  display: block;
+  width: auto;
+  height: auto;
+  padding: 0;
+  background: none;
+}
+hr {
+  transform: rotate(-90deg);
+  width: 82px;
+  position: absolute;
+  top: 47px;
+  right: 42px;
+  display: block;
+}
+.myTripsFooter,
+.travelMapFooter {
+  position: fixed;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  width: max-content;
+  margin: 0 auto;
+  transform: none !important;
+}
+.myTripsButtonHome,
+.myTripsButtonWorldMap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #fff;
+  text-decoration: none;
+  color: #23475a;
+  border-color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(12px);
+}
+.myTripsButtonHome {
+  width: 48px;
+  border-radius: 14px;
+}
+.myTripsButtonWorldMap {
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+.myTripsButtonHome:hover,
+.myTripsButtonWorldMap:hover {
+  transform: translateY(-2px);
 }
 
-@keyframes zoominoutsinglefeatured {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.05, 1.05);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
-}
-
-@media only screen and (min-width: 200px) {
-  .myTripsHeader {
-    margin-top: 70px;
-  }
-  .myTripsHeader h2 {
-    font-size: 1.8em;
-    margin-left: -175px;
-  }
-  .myTripsHeaderButton {
-    width: 40px;
-    height: 40px;
-    margin-left: 7px;
-  }
-  .noTripsText {
-    font-size: 16px;
-    margin-top: 20vh;
-  }
-  .myTripsItem {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 280px;
-    height: 100px;
-    margin: 5px;
-    padding: 5px;
-    justify-content: space-between;
-    border-radius: 10px 0 0 10px;
-    border: 2px solid black;
-    box-shadow: 2px 2px 5px #2e2828;
-    background-color: rgba(216, 241, 241, 0.85);
-  }
-  .pastTripItem {
-    display: flex;
-    align-items: center;
-    position: relative;
-    width: 280px;
-    height: 100px;
-    margin: 5px;
-    padding: 5px;
-    justify-content: space-between;
-    border-radius: 10px 0 0 10px;
-    border: 2px solid black;
-    box-shadow: 2px 2px 5px #2e2828;
-    background-color: rgba(216, 241, 241, 0.25);
-  }
-
-  .tripName {
-    margin: 0 80px 0 0;
-    text-transform: uppercase;
-    text-decoration: none;
-    font-size: 10px;
-    color: black;
-    position: relative;
-  }
-
-  .tripCardInfo {
-    display: flex;
-    align-items: center;
-  }
-
-  .tripDates {
-    right: 29.5px;
-    top: 4px;
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  .tripViewButton {
-    height: 35px;
-    width: 49px;
-    font-size: 12px;
-    right: 28px;
-    top: 54px;
-  }
-  hr {
-    right: 42px;
-  }
-  .tripCardInfo i {
-    display: none;
-  }
-}
-
-@media only screen and (min-width: 350px) {
-  .myTripsHeader {
-    margin-top: 0;
-  }
-  .myTripsHeader h2 {
-    font-size: 1.8em;
-    margin-left: -175px;
-  }
-  .myTripsHeaderButton {
-    width: 40px;
-    height: 40px;
-    margin-left: 7px;
-  }
-  .noTripsText {
-    font-size: 22px;
-    margin-top: 33vh;
-  }
+@media (max-width: 500px) {
   .myTripsItem,
   .pastTripItem {
-    width: 330px;
+    width: min(330px, calc(100vw - 32px));
   }
   .tripName {
-    font-size: 14px;
-    margin-left: 10px;
+    max-width: calc(100vw - 190px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .tripViewButton {
-    width: 52px;
-    font-size: 15px;
-    right: 26px;
-    font-weight: 500;
+  .myTripsFooter,
+  .travelMapFooter {
+    bottom: 16px;
   }
-  .tripCardInfo i {
-    display: inline;
-    margin-right: -5px;
+  .myTripsButtonWorldMap {
+    width: 48px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+  }
+  .myTripsButtonWorldMap i {
+    margin: 0;
+    font-size: 1rem;
   }
 }
 
-@media only screen and (min-width: 450px) {
-  .myTripsHeader h2 {
-    font-size: 1.9em;
-    margin-left: -160px;
-  }
-
-  .myTripsHeaderButton {
-    width: 45px;
-    height: 45px;
-    margin-left: 7px;
-  }
+@media (min-width: 450px) {
   .myTripsItem,
   .pastTripItem {
     width: 420px;
   }
   .tripName {
+    margin-left: 10px;
     font-size: 20px;
+  }
+  .tripDates {
+    right: 33px;
+    top: 6px;
+    font-size: 20px;
+    line-height: 1.1;
+  }
+  .tripViewButton {
+    height: 35px;
+    width: 105px;
+    font-size: 0.8rem;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    right: 30px;
+    top: 55px;
   }
 }

@@ -1,84 +1,139 @@
+.Home {
+  min-height: calc(100vh - 144px);
+  display: grid;
+  place-items: center;
+}
+
 .homePageContent {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  width: min(720px, 100%);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
-.myTravelsHome,
-.earth {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  background-size: cover;
+.homeIntro {
+  grid-column: 1 / -1;
+  margin-bottom: 50px;
+  color: #fff;
+  text-align: center;
 }
 
-.myTravelsHome {
-  background-image: url("/src/images/lake.jpg");
-  box-shadow: -1px -1px 2px 1px #000 inset, 0 0 10px 1px rgba(0, 0, 0, 0.365);
-  animation: zoominoutsinglefeatured 1s infinite;
+.homeEyebrow {
+  margin: 0 0 14px;
+  color: #8be3dc;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
 }
 
-.earth {
-  background-image: url("/src/images/earth.png");
-  background-size: cover;
-  box-shadow: -1px -1px 2px 1px #000 inset, 0 0 10px 1px rgba(0, 0, 0, 0.598);
-  animation: spin 10s linear alternate infinite;
+.homeIntro h1 {
+  max-width: 600px;
+  margin: 0 auto 14px;
+  font-size: clamp(2.35rem, 6vw, 4.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.homeIntro > p:last-child {
+  max-width: 480px;
+  margin: 0 auto;
+  color: rgba(238, 251, 255, 0.8);
+  font-size: 1.04rem;
+  line-height: 1.6;
 }
 
 .homeLink1,
 .homeLink2 {
+  min-height: 180px;
   display: flex;
-  flex-direction: column;
-  align-content: center;
-  align-items: center;
+  align-items: flex-end;
   text-decoration: none;
-  font-size: 1.2em;
+  border: 3px solid var(--line);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .homeLink1 {
-  width: 190px;
-  margin: 27vh auto 7vh auto;
+  background:
+    linear-gradient(145deg, rgba(3, 45, 67, 0.25), rgba(1, 23, 38, 0.86)),
+    url("../../images/lake.jpg") center / cover;
 }
 
 .homeLink2 {
-  width: 269px;
-  margin: auto;
+  background:
+    linear-gradient(145deg, rgba(14, 184, 166, 0.22), rgba(2, 31, 50, 0.88)),
+    url("../../images/earth.png") center / cover;
+}
+
+.homeLink1:hover,
+.homeLink2:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 54px rgba(2, 17, 30, 0.34);
 }
 
 .homePageLinksTitles {
+  width: 100%;
   display: flex;
   align-items: center;
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: 700;
-  margin: 15px 0;
-  padding: 15px;
-  border-radius: 50px;
-  color: white;
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 4px 4px 5px #181212;
-  background-color: rgba(37, 57, 73, 0.863);
-  z-index: 1;
+  gap: 10px;
+  padding: 18px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  background: linear-gradient(
+    90deg,
+    rgba(2, 24, 39, 0.92),
+    rgba(2, 24, 39, 0.3)
+  );
 }
 
-@keyframes zoominoutsinglefeatured {
-  0% {
-    transform: scale(1, 1);
-  }
-  50% {
-    transform: scale(1.05, 1.05);
-  }
-  100% {
-    transform: scale(1, 1);
-  }
+.myTravelsHome,
+.earth {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background-position: center;
+  background-size: cover;
 }
 
-@keyframes spin {
-  100% {
-    background-position: 100%;
+.myTravelsHome {
+  background-image: url("../../images/lake.jpg");
+}
+.earth {
+  background-image: url("../../images/earth.png");
+}
+
+@media (max-width: 560px) {
+  .Home {
+    align-items: start;
+  }
+  .homePageContent {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .homeIntro {
+    width: 100%;
+    margin: 20px 0 10px;
+    text-align: left;
+  }
+  .homeIntro h1 {
+    margin-left: 0;
+  }
+  .homeIntro > p:last-child {
+    margin-left: 0;
+  }
+  .homeLink1,
+  .homeLink2 {
+    min-height: 130px;
+    width: 100%;
   }
 }

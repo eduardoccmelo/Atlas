@@ -1,6 +1,7 @@
 import "./styles/Home.css";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Logo } from "./Logo";
 
 export default function Home() {
   const container = {
@@ -21,6 +22,11 @@ export default function Home() {
         animate="visible"
         className="homePageContent"
       >
+        <div className="homeIntro">
+          <Logo />
+          <h1>Every journey, beautifully remembered.</h1>
+          <p>Plan the details, keep the memories, and see your world unfold.</p>
+        </div>
         <Link className="homeLink1" to="/myTrips">
           <div className="homePageLinksTitles">
             <span className="myTravelsHome"></span>MY TRIPS

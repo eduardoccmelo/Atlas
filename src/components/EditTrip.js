@@ -7,6 +7,16 @@ import { useState, useEffect } from "react";
 import Form from "./Form";
 import "./styles/Form.css";
 
+const emptyCarRental = {
+  enabled: false,
+  company: "",
+  carType: "",
+  reservationNumber: "",
+  address: "",
+  pickupAt: "",
+  returnAt: "",
+};
+
 export default function EditTrip() {
   const history = useHistory();
   const { id } = useParams();
@@ -28,27 +38,37 @@ export default function EditTrip() {
   const [inputExpenseValue, setInputExpenseValue] = useState("");
   const [allExpenses, setAllExpenses] = useState([]);
   const [inputNotes, setInputNotes] = useState("");
+  const [notes, setNotes] = useState([]);
+  const [transportLegs, setTransportLegs] = useState([]);
+  const [accommodations, setAccommodations] = useState([]);
+  const [carRental, setCarRental] = useState(emptyCarRental);
 
   function handleOnSubmit(e) {
     e.preventDefault();
+
+    const mainLeg = transportLegs[0] || {};
+    const firstStay = accommodations[0] || {};
 
     editSingleTripFromLocalStorage(id, {
       name: inputDestinationName,
       start: inputTripStart,
       end: inputTripEnd,
-      transportation: inputTransportType,
-      departure: inputTripDeparture,
-      arrival: inputTripArrival,
-      accommodation: inputTripAccommodation,
-      checkinDate: inputCheckinDate,
-      checkinTime: inputCheckinTime,
-      checkoutDate: inputCheckoutDate,
-      checkoutTime: inputCheckoutTime,
+      transportation: mainLeg.type || inputTransportType,
+      departure: mainLeg.departureTime || inputTripDeparture,
+      arrival: mainLeg.arrivalTime || inputTripArrival,
+      accommodation: firstStay.name || inputTripAccommodation,
+      checkinDate: firstStay.checkinDate || inputCheckinDate,
+      checkinTime: firstStay.checkinTime || inputCheckinTime,
+      checkoutDate: firstStay.checkoutDate || inputCheckoutDate,
+      checkoutTime: firstStay.checkoutTime || inputCheckoutTime,
+      transportLegs,
+      accommodations,
+      carRental,
       sightseeings: allSightseeings,
       expenses: allExpenses,
-      notes: inputNotes,
+      notes,
     });
-    history.push(`/myTrips/${id}`);
+    history.push("/myTrips");
   }
 
   useEffect(() => {
@@ -63,10 +83,61 @@ export default function EditTrip() {
     setInputCheckinDate(myTrip.checkinDate);
     setInputCheckinTime(myTrip.checkinTime);
     setInputCheckoutDate(myTrip.checkoutDate);
-    setInputCheckoutTime(myTrip.checkinTime);
+    setInputCheckoutTime(myTrip.checkoutTime);
     setAllSightseeings(myTrip.sightseeings);
     setAllExpenses(myTrip.expenses);
     setInputNotes(myTrip.notes);
+    setNotes(
+      Array.isArray(myTrip.notes)
+        ? myTrip.notes
+        : myTrip.notes
+          ? [{ id: "note-1", message: myTrip.notes }]
+          : [],
+    );
+    setTransportLegs(
+      myTrip.transportLegs && myTrip.transportLegs.length
+        ? myTrip.transportLegs
+        : myTrip.transportation && myTrip.transportation !== "none"
+          ? [
+            {
+              id: "main-leg",
+              type: myTrip.transportation || "plane",
+              company: "",
+              bookingReference: "",
+              departureLocation: "",
+              departureAddress: "",
+              arrivalLocation: "",
+              arrivalAddress: "",
+              departureTime: myTrip.departure || "",
+              arrivalTime: myTrip.arrival || "",
+              seat: "",
+              vehicleNumber: "",
+              hasConnection: false,
+            },
+            ]
+          : [],
+    );
+    setAccommodations(
+      myTrip.accommodations && myTrip.accommodations.length
+        ? myTrip.accommodations
+        : myTrip.accommodation
+          ? [
+              {
+                id: "stay-1",
+                name: myTrip.accommodation,
+                provider: "",
+                reservationNumber: "",
+                type: "",
+                address: "",
+                checkinDate: myTrip.checkinDate || "",
+                checkinTime: myTrip.checkinTime || "",
+                checkoutDate: myTrip.checkoutDate || "",
+                checkoutTime: myTrip.checkoutTime || "",
+              },
+            ]
+          : [],
+    );
+    setCarRental(myTrip.carRental || emptyCarRental);
   }, [id]);
 
   function handleSightseeingOnClick(e) {
@@ -141,6 +212,14 @@ export default function EditTrip() {
         setCurrency={setCurrency}
         inputNotes={inputNotes}
         setInputNotes={setInputNotes}
+        notes={notes}
+        setNotes={setNotes}
+        transportLegs={transportLegs}
+        setTransportLegs={setTransportLegs}
+        accommodations={accommodations}
+        setAccommodations={setAccommodations}
+        carRental={carRental}
+        setCarRental={setCarRental}
       />
     </div>
   );

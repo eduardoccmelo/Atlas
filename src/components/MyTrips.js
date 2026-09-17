@@ -26,7 +26,7 @@ export default function MyTrips() {
 
   function handleRemoveTrip(name) {
     const confirmation = window.confirm(
-      "Do you really want to delete your Trip?"
+      "Do you really want to delete your Trip?",
     );
     if (confirmation === true) {
       removeTripFromLocalStorage(name);
@@ -49,10 +49,12 @@ export default function MyTrips() {
       const startMonth = new Date(trip.start).toLocaleString("default", {
         month: "short",
       });
+      const startYear = trip.start.slice(2, 4);
       const endDay = trip.end.slice(8, 10);
       const endMonth = new Date(trip.end).toLocaleString("default", {
         month: "short",
       });
+      const endYear = trip.end.slice(2, 4);
 
       return (
         <Item key={trip.id}>
@@ -64,8 +66,10 @@ export default function MyTrips() {
             transportation={trip.transportation}
             startDay={startDay}
             startMonth={startMonth}
+            startYear={startYear}
             endDay={endDay}
             endMonth={endMonth}
+            endYear={endYear}
           />
         </Item>
       );
@@ -75,11 +79,12 @@ export default function MyTrips() {
     <div className="MyTrips">
       <div className="myTripsHeader">
         <h2>MY TRIPS</h2>
-        <Link to="/newTrip" className="myTripsHeaderButton">
-          <i className="fas fa-plus"></i>
-        </Link>
       </div>
       <div className="myTripsMain">
+        <Link to="/newTrip" className="myTripsHeaderButton">
+          <i className="fas fa-plus"></i>
+          <span>ADD A TRIP</span>
+        </Link>
         {trips.length < 1 && (
           <p className="noTripsText">You don't have any trips yet</p>
         )}

@@ -19,31 +19,30 @@ function App() {
           <Switch>
             <Route exact path="/">
               <Home />
-              <Logo />
             </Route>
             <Route path="/myTrips/:id/edit">
-              <EditTrip />
               <Logo />
+              <EditTrip />
             </Route>
             <Route path="/myTrips/:id">
-              <Trip />
               <Logo />
+              <Trip />
             </Route>
             <Route path="/myTrips">
-              <MyTrips />
               <Logo />
+              <MyTrips />
             </Route>
             <Route path="/newTrip">
-              <NewTrip />
               <Logo />
+              <NewTrip />
             </Route>
             <Route path="/worldMap">
-              <WorldMap />
               <Logo />
+              <WorldMap />
             </Route>
             <Route path="*">
-              <PageNotFound />
               <Logo />
+              <PageNotFound />
             </Route>
           </Switch>
         </main>

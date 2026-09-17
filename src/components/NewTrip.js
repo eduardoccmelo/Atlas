@@ -23,10 +23,25 @@ export default function NewTrip() {
   const [inputExpenseValue, setInputExpenseValue] = useState("");
   const [allExpenses, setAllExpenses] = useState([]);
   const [inputNotes, setInputNotes] = useState("");
+  const [notes, setNotes] = useState([]);
+  const [transportLegs, setTransportLegs] = useState([]);
+  const [accommodations, setAccommodations] = useState([]);
+  const [carRental, setCarRental] = useState({
+    enabled: false,
+    company: "",
+    carType: "",
+    reservationNumber: "",
+    address: "",
+    pickupAt: "",
+    returnAt: "",
+  });
   const history = useHistory();
 
   function handleOnSubmit(e) {
     e.preventDefault();
+
+    const mainLeg = transportLegs[0] || {};
+    const firstStay = accommodations[0] || {};
 
     addTripToLocalStorage({
       id: `${inputDestinationName.slice(
@@ -36,17 +51,20 @@ export default function NewTrip() {
       name: inputDestinationName,
       start: inputTripStart,
       end: inputTripEnd,
-      transportation: inputTransportType,
-      departure: inputTripDeparture,
-      arrival: inputTripArrival,
-      accommodation: inputTripAccommodation,
-      checkinDate: inputCheckinDate,
-      checkinTime: inputCheckinTime,
-      checkoutDate: inputCheckoutDate,
-      checkoutTime: inputCheckoutTime,
+      transportation: mainLeg.type || inputTransportType,
+      departure: mainLeg.departureTime || inputTripDeparture,
+      arrival: mainLeg.arrivalTime || inputTripArrival,
+      accommodation: firstStay.name || inputTripAccommodation,
+      checkinDate: firstStay.checkinDate || inputCheckinDate,
+      checkinTime: firstStay.checkinTime || inputCheckinTime,
+      checkoutDate: firstStay.checkoutDate || inputCheckoutDate,
+      checkoutTime: firstStay.checkoutTime || inputCheckoutTime,
+      transportLegs,
+      accommodations,
+      carRental,
       sightseeings: allSightseeings,
       expenses: allExpenses,
-      notes: inputNotes,
+      notes,
     });
     history.push("/myTrips");
   }
@@ -122,6 +140,14 @@ export default function NewTrip() {
         setCurrency={setCurrency}
         inputNotes={inputNotes}
         setInputNotes={setInputNotes}
+        notes={notes}
+        setNotes={setNotes}
+        transportLegs={transportLegs}
+        setTransportLegs={setTransportLegs}
+        accommodations={accommodations}
+        setAccommodations={setAccommodations}
+        carRental={carRental}
+        setCarRental={setCarRental}
       />
     </div>
   );

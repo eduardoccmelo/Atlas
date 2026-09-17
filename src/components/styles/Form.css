@@ -1,353 +1,145 @@
-.TripForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 12px;
-  font-size: 0.9em;
-}
+.NewTrip,
+.EditTrip { max-width: 880px; margin: 0 auto; }
+.newTripHeader, .editTripHeader, .TripHeader { margin: 16px 0 22px; }
+.NewTrip h2, .EditTrip h2, .Trip h2 { margin: 0; color: #fff; font-size: clamp(1.7rem, 3vw, 2.3rem); letter-spacing: -0.04em; }
+.NewTrip h2::after, .EditTrip h2::after { content: ""; display: block; width: 52px; height: 4px; margin-top: 10px; border-radius: 99px; background: var(--teal); }
 
-.TripHeader {
-  display: flex;
-  align-items: center;
-  padding: 20px 0 0 16px;
-  margin-left: 20px;
-  z-index: 1;
+.TripForm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.formHeader, .formTransport, .formAccommodation, .formSightseeings, .formExpenses, .formNotes {
+  padding: 22px; border: 1px solid rgba(255, 255, 255, 0.65); border-radius: 18px; color: var(--ink);
+  background: rgba(234, 246, 248, 0.92); box-shadow: var(--shadow); backdrop-filter: blur(14px);
 }
+.formHeader, .formTransport, .formAccommodation, .formSightseeings, .formExpenses, .formNotes { grid-column: 1 / -1; }
+.formHeader { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.formHeader .formTravelDates { display: contents; }
+.formHeader .tripNameForm { width: auto; }
+.checkinCheckout, .departureArrival { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.formTransport { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: start; }
+.formAccommodation { display: grid; gap: 12px; }
+.formAccommodation, .formSightseeings, .formExpenses, .formNotes { gap: 10px; padding: 16px 22px; }
+.formSightseeings, .formExpenses { display: grid; }
+.formSightseeings > .addDetailButton, .formExpenses > .addDetailButton { margin-top: 4px; }
+.formSectionTitle { grid-column: 1 / -1; margin: 0; color: var(--ocean); font-size: .68rem; font-weight: 850; letter-spacing: .12em; }
+.detailCollection { grid-column: 1 / -1; display: grid; gap: 12px; width: 100%; }
+.detailCard { padding: 15px; border: 1px solid #d5e5ea; border-radius: 12px; background: rgba(255, 255, 255, .58); }
+.detailCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--ocean); font-size: .72rem; letter-spacing: .08em; }
+.detailFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.transportFields { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.transportFields > label, .transportFields > .detailHint { grid-column: span 6; }
+.transportFields.isPlane > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
+.transportFields.isPlane > label:nth-of-type(2) { grid-column: 9 / span 4; grid-row: 2; }
+.transportFields.isPlane > label:nth-of-type(3) { grid-column: 9 / span 4; grid-row: 1; }
+.transportFields.isPlane > label:nth-of-type(4) { grid-column: 1 / span 4; grid-row: 2; }
+.transportFields.isPlane > label:nth-of-type(14) { grid-column: 5 / span 4; grid-row: 2; }
+.transportFields.isPlane .flightDateField { grid-column: 5 / span 4; grid-row: 1; }
+.transportFields.isPlane > label:nth-of-type(5) { grid-column: 1 / span 4; grid-row: 3; }
+.transportFields.isPlane > label:nth-of-type(6) { grid-column: 5 / span 4; grid-row: 3; }
+.transportFields.isPlane .flightMetricDistance { grid-column: 9 / span 4; grid-row: 3; }
+.transportFields.isPlane > label:nth-of-type(10) { grid-column: 1 / span 4; grid-row: 4; }
+.transportFields.isPlane > label:nth-of-type(11) { grid-column: 5 / span 4; grid-row: 4; }
+.transportFields.isPlane .flightMetricDuration { grid-column: 9 / span 4; grid-row: 4; }
+.transportFields.isBus > label:nth-of-type(1), .transportFields.isTrain > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(2), .transportFields.isTrain > label:nth-of-type(2) { grid-column: 5 / span 4; grid-row: 1; }
+.transportFields.isTrain > label:nth-of-type(9) { grid-column: 9 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(3) { grid-column: 1 / span 6; grid-row: 2; }
+.transportFields.isBus > label:nth-of-type(10) { grid-column: 7 / span 6; grid-row: 2; }
+.transportFields.isBus > label:nth-of-type(1) { grid-column: 1 / span 6; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(2) { grid-column: 7 / span 6; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(6) { grid-column: 1 / span 6; grid-row: 3; }
+.transportFields.isBus > label:nth-of-type(7) { grid-column: 7 / span 6; grid-row: 3; }
+.transportFields.isBus > label:nth-of-type(8) { grid-column: 1 / span 6; grid-row: 4; }
+.transportFields.isBus > label:nth-of-type(9) { grid-column: 7 / span 6; grid-row: 4; }
+.transportFields.isBus > label:nth-of-type(4) { grid-column: 1 / span 6; grid-row: 5; }
+.transportFields.isBus > label:nth-of-type(5) { grid-column: 7 / span 6; grid-row: 5; }
+.transportFields.isTrain > label:nth-of-type(3) { grid-column: 1 / span 6; grid-row: 2; }
+.transportFields.isTrain > label:nth-of-type(4) { grid-column: 7 / span 6; grid-row: 2; }
+.transportFields.isTrain > label:nth-of-type(5) { grid-column: 1 / span 6; grid-row: 3; }
+.transportFields.isTrain > label:nth-of-type(6) { grid-column: 7 / span 6; grid-row: 3; }
+.transportFields.isTrain > label:nth-of-type(7) { grid-column: 1 / span 6; grid-row: 4; }
+.transportFields.isTrain > label:nth-of-type(8) { grid-column: 7 / span 6; grid-row: 4; }
+.flightMetricDistance input, .flightMetricDuration input { color: #829ab1; background: rgba(222, 235, 240, .8); cursor: not-allowed; }
+.flightTimeError { margin: 0; padding: 10px 12px; border: 1px solid rgba(179, 58, 50, .35); border-radius: 8px; color: #9f2f2a; background: rgba(255, 235, 232, .9); font-size: .82rem; font-weight: 700; }
+.transportFields.isPlane > label:nth-of-type(7), .transportFields.isPlane > label:nth-of-type(8) { display: none; }
+.detailFields label { display: flex; flex-direction: column; gap: 5px; color: #486581; font-size: .66rem; font-weight: 850; letter-spacing: .06em; }
+.cityAutocomplete { position: relative; width: 100%; }
+.citySuggestions { position: absolute; z-index: 12; top: calc(100% + 4px); right: 0; left: 0; max-height: 180px; overflow-y: auto; border: 1px solid #cbdde8; border-radius: 8px; background: #fff; box-shadow: 0 10px 22px rgba(20, 56, 78, .2); }
+.citySuggestions button { display: block; width: 100%; padding: 9px 10px; border: 0; border-bottom: 1px solid #edf3f5; color: #334e68; background: #fff; cursor: pointer; font: inherit; font-size: .78rem; text-align: left; }
+.citySuggestions button:hover { background: #eaf5f5; color: var(--ocean); }
+.detailFieldWide { grid-column: 1 / -1; }
+.detailHint { grid-column: 1 / -1; margin: 0; color: #627d98; font-size: .82rem; line-height: 1.45; }
+.connectionToggle, .rentalToggle { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #334e68; font-size: .82rem; font-weight: 700; }
+.formTransport .rentalToggle { margin-top: 0; }
+.connectionToggle input, .rentalToggle input { width: 16px; min-height: auto; accent-color: var(--teal); }
+.addDetailButton, .removeDetailButton { cursor: pointer; font-weight: 800; }
+.addDetailButton { justify-self: start; min-height: 36px; padding: 0 12px; border: 1px solid transparent; border-radius: 8px; color: var(--paper); background: var(--teal); font-size: .82rem; letter-spacing: .01em; }
+.removeDetailButton { padding: 0; color: #b33a32; background: transparent; font-size: .72rem; }
+.rentalCard { grid-column: 1 / -1; }
+.amountWithCurrency { display: flex; }
+.amountWithCurrency input { min-width: 0; border-radius: 10px 0 0 10px; }
+.amountWithCurrency select { width: 56px; min-height: 43px; padding: 0 6px; border: 1px solid #cbdde8; border-left: 0; border-radius: 0 10px 10px 0; color: var(--ink); background: rgba(255, 255, 255, .9); }
+.formNotes { width: 100%; display: grid; gap: 12px; }
+.noteEntry { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; width: 100%; gap: 10px; padding: 12px; border: 1px solid #d5e5ea; border-radius: 12px; background: rgba(255, 255, 255, .58); }
+.noteEntry .inputNotesForm { min-width: 0; }
+.noteEntry .removeDetailButton { align-self: start; min-height: 36px; padding: 0 10px; border: 1px solid rgba(179, 58, 50, .25); border-radius: 8px; background: rgba(255, 255, 255, .72); }
+.noteEntry textarea { min-height: 82px; }
 
-.newTripHeader,
-.editTripHeader {
-  display: flex;
-  align-items: center;
-  padding: 20px 0 0 16px;
-  margin-left: 25px;
-  z-index: 1;
+.tripNameForm, .tripStartForm, .tripEndForm, .tripTransportForm, .inputTranportTimeForm, .inputAccommodationForm, .inputNotesForm {
+  display: flex; flex-direction: column; gap: 7px; color: #486581; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.085em;
 }
-
-.NewTrip h2,
-.EditTrip h2 {
-  font-size: 1.9em;
-  text-align: end;
-  padding-right: 20px;
-  border-radius: 50px;
-  color: white;
-  border: solid 2px rgb(255, 255, 255);
-  background-color: rgba(37, 57, 73, 0.95);
-  box-shadow: 2px 2px 5px #181212;
-}
-
-.EditTrip h2 {
-  width: 300px;
-  margin: 3px 0 10px -160px;
-}
-
-.NewTrip h2 {
-  width: 210px;
-  margin: 3px 0 10px -65px;
-  padding-right: 20px;
-}
-
-.Trip h2 {
-  width: 300px;
-  margin: 5px 0 10px -160px;
-  padding-right: 20px;
-  font-size: 1.9em;
-  text-align: end;
-  border-radius: 50px;
-  color: white;
-  background-color: rgba(37, 57, 73, 0.95);
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 2px 2px 5px #181212;
-}
-
-.formHeader,
-.formTravelDates,
-.formTransport,
-.formAccommodation,
-.formNotes {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 350px;
-  margin: 3px;
-  padding: 10px 0 10px 0;
-  border-radius: 10px;
-  color: white;
-  background-color: rgba(37, 57, 73, 0.95);
-  box-shadow: 2px 2px 5px #2e2828;
-  border: rgb(255, 255, 255) solid 2px;
-}
-
-.formSightseeings,
-.formExpenses {
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-  margin: 3px;
-  padding: 10px;
-  border-radius: 10px;
-  color: white;
-  background-color: rgba(37, 57, 73, 0.95);
-  box-shadow: 2px 2px 5px #2e2828;
-  border: rgb(255, 255, 255) solid 2px;
-}
-
-.formTravelDates {
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  justify-content: center;
-}
-
-.tripNameForm,
-.inputNotesForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-transform: uppercase;
-  margin: 0;
-}
-
+.tripNameForm { width: min(420px, 100%); }
 .inputAccommodationFormName {
-  display: flex;
-  margin-bottom: 2px;
+  display: grid; grid-template-columns: 135px minmax(0, 1fr); align-items: center; gap: 14px;
+  color: #486581; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.085em;
 }
-
-.inputAccommodationFormName input {
-  margin-left: 5px;
+.TripForm input, .TripForm select, .TripForm textarea {
+  width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid #cbdde8; border-radius: 10px;
+  outline: none; color: var(--ink); background: rgba(255, 255, 255, 0.9); font-size: 0.82rem; transition: border-color 160ms ease, box-shadow 160ms ease;
 }
-
-.inputNotesForm textarea {
-  width: 320px;
-  height: 100px;
-  min-width: 320px;
-  max-width: 320px;
-  margin-top: 2px;
-  font-size: 12px;
+.TripForm .connectionToggle input, .TripForm .rentalToggle input {
+  flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; min-height: 18px; padding: 0;
+  accent-color: var(--teal);
 }
-
-.tripNameForm input {
-  width: 190px;
-  height: 30px;
-  padding-left: 4px;
+.TripForm input:focus, .TripForm select:focus, .TripForm textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(12, 133, 128, 0.16); }
+.TripForm .flightMetricDistance input, .TripForm .flightMetricDuration input { color: #627d98; background: #e7eef1; border-color: #d5e1e6; cursor: not-allowed; }
+.TripForm textarea { min-height: 112px; resize: vertical; }
+.sightSeeingHeader label, .expensesHeader label { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; color: #486581; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.085em; }
+.sightSeeingHeader input, .expensesHeader input, .expensesHeader select { grid-row: 2; }
+.expensesHeader label { grid-template-columns: minmax(0, 1fr) 82px 58px auto; }
+.addSightseeingButton, .addExpenseButton, .formTripButton, .tripCancelButton {
+  min-height: 42px; padding: 0 16px; border-radius: 10px; cursor: pointer; font-weight: 800; transition: transform 160ms ease, filter 160ms ease;
 }
-
-.tripStartForm input,
-.tripEndForm input,
-.inputTranportTimeForm input,
-.inputAccommodationForm input {
-  padding-left: 13px;
-  margin-left: 0 0 2px 3px;
+.addSightseeingButton, .addExpenseButton { grid-row: 2; color: #fff; background: var(--ocean); }
+.sightseeingItem, .expenseItem {
+  position: relative; display: flex; align-items: center; min-height: 38px; margin-top: 10px; padding: 8px 44px 8px 12px;
+  border: 1px solid #d7e5ec; border-radius: 10px; color: #334e68; background: rgba(244, 250, 252, 0.92); font-size: 0.9rem;
 }
+.sightseeingItem button, .expenseItem button { position: absolute; right: 8px; width: 26px; height: 26px; border-radius: 7px; cursor: pointer; color: #fff; background: #d95745; }
+.expensesSum { margin: 12px 0 0; color: var(--ocean); font-size: 1.15rem; font-weight: 850; text-align: right; }
+.tripFooter { grid-column: 1 / -1; display: flex; justify-content: center; gap: 10px; padding: 6px 0 18px; }
+.cancelTrip { text-decoration: none; }
+.formTripButton { color: var(--paper); background: var(--teal); }
+.tripCancelButton { color: #fff; background: rgba(10, 46, 62, 0.88); }
+.addSightseeingButton:hover, .addExpenseButton:hover, .formTripButton:hover, .tripCancelButton:hover { transform: translateY(-2px); filter: brightness(1.06); }
 
-.checkinCheckout,
-.departureArrival,
-.formTransport {
-  display: flex;
+@media (max-width: 680px) {
+  .TripForm { grid-template-columns: 1fr; }
+  .formSightseeings, .formExpenses { grid-column: 1 / -1; }
+  .formHeader, .formTransport, .formAccommodation, .formNotes { grid-column: auto; }
+  .formHeader { grid-template-columns: 1fr; }
+  .formTransport { grid-template-columns: 1fr; }
+  .detailFields { grid-template-columns: 1fr; }
+  .transportFields { grid-template-columns: 1fr; }
+  .transportFields > label, .transportFields > .detailHint { grid-column: auto; }
+  .formTransport .transportFields { grid-template-columns: 1fr !important; }
+  .formTransport .transportFields > label { grid-column: auto !important; grid-row: auto !important; }
+  .detailFieldWide { grid-column: auto; }
 }
-
-.tripStartForm,
-.tripEndForm,
-.inputAccommodationForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.tripEndForm {
-  margin-left: 2px;
-}
-
-.inputTranportTimeForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0 20px;
-}
-
-.tripTransportForm {
-  display: flex;
-  margin-bottom: 2px;
-}
-
-.tripTransportForm select {
-  padding-bottom: 2px;
-  margin-left: 5px;
-}
-
-.tripFooter {
-  display: flex;
-  margin: 8px 0;
-}
-
-.formTripButton,
-.tripCancelButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 50px;
-  margin: 0 10px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.9em;
-  border-radius: 10px;
-  color: white;
-  box-shadow: 2px 2px 5px #181212;
-  border: solid 2px rgb(255, 255, 255);
-  background-color: rgba(37, 57, 73, 0.95);
-}
-
-.formTripButton {
-  background-color: rgb(9, 65, 9);
-}
-
-.cancelTrip {
-  text-decoration: none;
-}
-
-.tripCancelButton {
-  background-color: rgb(85, 31, 31);
-}
-
-.formTripButton:hover,
-.tripCancelButton:hover {
-  scale: 105%;
-}
-
-.formSightseeings {
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-  margin: 3px;
-  padding: 10px;
-  border-radius: 10px;
-  color: white;
-  background-color: rgba(37, 57, 73, 0.95);
-  box-shadow: 2px 2px 5px #2e2828;
-  border: rgb(255, 255, 255) solid 2px;
-}
-
-.sightSeeingHeader,
-.expensesHeader {
-  align-self: center;
-}
-
-.expensesSum {
-  margin-top: 5px;
-  font-size: 18px;
-  text-align: center;
-}
-
-.sightSeeingHeader input {
-  margin: 0 5px 0 5px;
-  width: 150px;
-}
-
-.expensesHeader input:nth-child(1) {
-  margin: 0 0 0 4px;
-  width: 115px;
-}
-
-.expensesHeader input:nth-child(2) {
-  margin: 0 4px 0 4px;
-  width: 52px;
-}
-
-.expensesHeader select {
-  margin: 0 4px 0 0;
-  width: 34px;
-}
-
-.sightseeingItem,
-.expenseItem {
-  position: relative;
-  margin: 10px 20px 0 20px;
-  display: flex;
-  padding: 10px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  height: 22px;
-  color: black;
-  border: solid 2px rgb(0, 0, 0);
-  background-color: rgba(255, 255, 255, 0.85);
-}
-
-input,
-textarea {
-  padding: 2px;
-  border: solid 1px rgb(0, 0, 0);
-}
-
-.sightseeingItem button,
-.expenseItem button {
-  margin-left: 5px;
-  position: absolute;
-  border-radius: 10px;
-  border: none;
-  right: 2px;
-  height: 16px;
-  font-size: 0.9em;
-  cursor: pointer;
-  width: 25px;
-  text-align: center;
-  padding-left: 2px;
-  background-color: rgb(88, 10, 10);
-  color: white;
-}
-
-.addSightseeingButton,
-.addExpenseButton {
-  border-radius: 5px;
-  padding: 1px 3px 1px 3px;
-  cursor: pointer;
-  color: white;
-  border: 1px solid white;
-  background-color: rgb(9, 65, 9);
-}
-
-@media only screen and (max-width: 365px) {
-  .formHeader,
-  .formTravelDates,
-  .formTransport,
-  .formAccommodation,
-  .formNotes {
-    width: 290px;
-    font-size: 0.8em;
-    text-align: center;
-  }
-  .formSightseeings,
-  .formExpenses {
-    width: 290px;
-    font-size: 0.8em;
-    padding: 10px 2px;
-  }
-  .sightSeeingHeader input {
-    width: 140px;
-  }
-  .expensesHeader input:nth-child(1) {
-    margin: 0 0 0 2px;
-    width: 100px;
-  }
-
-  .expensesHeader input:nth-child(2) {
-    margin: 0 2px 0 2px;
-    width: 45px;
-  }
-
-  .expensesHeader select {
-    margin: 0 3px 0 0;
-    width: 33px;
-  }
-
-  .inputTranportTimeForm {
-    margin: 0;
-  }
-  .inputNotesForm textarea {
-    min-width: 260px;
-    max-width: 260px;
-    width: 260px;
-  }
-  .inputAccommodationFormName {
-    flex-direction: column;
-  }
+@media (max-width: 460px) {
+  .formHeader, .formTravelDates, .formTransport, .formAccommodation, .formSightseeings, .formExpenses, .formNotes { padding: 17px; }
+  .formTravelDates, .checkinCheckout, .departureArrival { grid-template-columns: 1fr; }
+  .inputAccommodationFormName { grid-template-columns: 1fr; gap: 7px; }
+  .expensesHeader label { grid-template-columns: minmax(0, 1fr) 62px auto; }
+  .expensesHeader select { display: none; }
+  .tripFooter { justify-content: stretch; }
+  .formTripButton, .tripCancelButton { flex: 1; }
 }

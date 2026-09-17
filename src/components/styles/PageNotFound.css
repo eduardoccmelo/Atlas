@@ -1,33 +1,25 @@
 .pageNotFound {
   display: grid;
-  justify-items: center;
-  align-items: center;
-  margin: 10px;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  font-size: 24px;
+  min-height: 65vh;
+  place-items: center;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.7rem, 5vw, 3rem);
+  font-weight: 850;
+  letter-spacing: -.045em;
 }
-
 .pageNotFoundButtonHome {
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
-  width: 50px;
-  height: 50px;
-  padding: 5px;
-  border-radius: 50px;
-  text-decoration: none;
-  font-size: 20px;
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.45);
+  border-radius: 14px;
+  color: #fff;
+  background: rgba(4,31,45,.82);
+  box-shadow: 0 10px 28px rgba(0,0,0,.2);
   cursor: pointer;
-  color: white;
-  border: solid 2px rgb(255, 255, 255);
-  box-shadow: 2px 2px 5px #181212;
-  background-color: rgb(37, 57, 73);
-}
-
-.pageNotFoundButtonHome:hover {
-  scale: 105%;
 }

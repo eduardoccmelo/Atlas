@@ -1,10 +1,12 @@
 export function getMarkersFromLocalStorage() {
-  const myMarkers = JSON.parse(localStorage.getItem("markerData")) || [];
-  return myMarkers;
+  try {
+    const storedMarkers = JSON.parse(localStorage.getItem("markerData"));
+    return Array.isArray(storedMarkers) ? storedMarkers : [];
+  } catch {
+    return [];
+  }
 }
 
-export function addMarkerToLocalStorage(markerData) {
-  const myMarkers = getMarkersFromLocalStorage();
-  myMarkers.push(markerData);
-  localStorage.setItem("markerData", JSON.stringify(myMarkers));
+export function saveMarkersToLocalStorage(markers) {
+  localStorage.setItem("markerData", JSON.stringify(markers));
 }

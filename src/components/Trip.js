@@ -33,6 +33,55 @@ export default function Trip() {
     return `${singleTrip.expenses[0].currency}${sum}`;
   }
 
+  function formatDate(date) {
+    if (!date) return "Not added yet";
+    return `${date.slice(8, 10)}.${new Date(date).toLocaleString("default", {
+      month: "short",
+    })}`;
+  }
+
+  function DetailField({ label, children, isEmpty = false }) {
+    return (
+      <div className={`tripDetailItem${isEmpty ? " isEmpty" : ""}`}>
+        <div className="tripDetailsFieldTitle">{label}</div>
+        <div className="tripDetailsFieldContent">{children}</div>
+      </div>
+    );
+  }
+
+  function transportSummary(leg) {
+    return [
+      leg.company,
+      leg.vehicleNumber,
+      leg.departureLocation && "From " + leg.departureLocation,
+      leg.arrivalLocation && "to " + leg.arrivalLocation,
+      leg.bookingReference && "Booking " + leg.bookingReference,
+      leg.seat && "Seat " + leg.seat,
+      leg.paidAmount && (leg.currency || "€") + leg.paidAmount,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  function staySummary(stay) {
+    return [
+      stay.type,
+      stay.provider,
+      stay.reservationNumber && "Booking " + stay.reservationNumber,
+      stay.address,
+      stay.paidAmount && (stay.currency || "€") + stay.paidAmount,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  function notesSummary(notes) {
+    if (Array.isArray(notes)) {
+      return notes.map((note) => note.message).filter(Boolean).join(" · ");
+    }
+    return notes || "";
+  }
+
   return singleTrip ? (
     <div className="TripDetails">
       <div className="tripDetailsHeader">
@@ -45,125 +94,97 @@ export default function Trip() {
         animate="visible"
         className="tripDetailsContent"
       >
-        <div>
-          <div className="tripDetailsFieldTitle">START / END</div>
-          <div className="tripDetailsFieldContent">
-            <i className="far fa-calendar-check"></i>
-            {singleTrip.start.slice(8, 10)}.
-            {new Date(singleTrip.start).toLocaleString("default", {
-              month: "short",
-            })}
-            {" / "}
-            {singleTrip.end.slice(8, 10)}.
-            {new Date(singleTrip.end).toLocaleString("default", {
-              month: "short",
-            })}
-          </div>
-        </div>
-        {singleTrip.transportation && (
-          <div>
-            <div className="tripDetailsFieldTitle">TRANSPORTATION TYPE</div>
-            <div className="tripDetailsFieldContent capitalize">
-              {singleTrip.transportation}
-            </div>
-          </div>
+        <DetailField label="START / END">
+          <i className="far fa-calendar-check"></i>
+          {formatDate(singleTrip.start)} / {formatDate(singleTrip.end)}
+        </DetailField>
+        {(!singleTrip.transportLegs || singleTrip.transportLegs.length === 0) && (
+          <DetailField
+            label="TRANSPORT"
+            isEmpty={!singleTrip.transportation || singleTrip.transportation === "none"}
+          >
+            {singleTrip.transportation && singleTrip.transportation !== "none"
+              ? singleTrip.transportation
+              : "Not added yet"}
+          </DetailField>
         )}
-        {singleTrip.departure && (
-          <div>
-            <div className="tripDetailsFieldTitle">DEPARTURE</div>
-            <div className="tripDetailsFieldContent">
-              <i className="far fa-clock"></i>
-              {singleTrip.departure}
-            </div>
-            {singleTrip.arrival && (
-              <div>
-                <div className="tripDetailsFieldTitle">ARRIVAL</div>
-                <div className="tripDetailsFieldContent">
-                  <i className="far fa-clock"></i>
-                  {singleTrip.arrival}
-                </div>
-              </div>
-            )}
-          </div>
+        {singleTrip.transportLegs &&
+          singleTrip.transportLegs.map((leg, index) => (
+            <DetailField
+              key={leg.id || index}
+              label={(leg.type || "TRANSPORT") + " " + (index + 1)}
+              isEmpty={!transportSummary(leg)}
+            >
+              {transportSummary(leg) || "Not added yet"}
+            </DetailField>
+          ))}
+        <DetailField label="DEPARTURE" isEmpty={!singleTrip.departure}>
+          <i className="far fa-clock"></i>
+          {singleTrip.departure || "Not added yet"}
+        </DetailField>
+        <DetailField label="ARRIVAL" isEmpty={!singleTrip.arrival}>
+          <i className="far fa-clock"></i>
+          {singleTrip.arrival || "Not added yet"}
+        </DetailField>
+        {(!singleTrip.accommodations || singleTrip.accommodations.length === 0) && (
+          <DetailField label="ACCOMMODATION" isEmpty={!singleTrip.accommodation}>
+            {singleTrip.accommodation || "Not added yet"}
+          </DetailField>
         )}
-
-        {singleTrip.accommodation && (
-          <div>
-            <div className="tripDetailsFieldTitle">ACCOMMODATION</div>{" "}
-            <div className="tripDetailsFieldContent">
-              {singleTrip.accommodation}
-            </div>
-          </div>
+        {singleTrip.accommodations &&
+          singleTrip.accommodations.map((stay, index) => (
+            <DetailField
+              key={stay.id || index}
+              label={"STAY " + (index + 1)}
+              isEmpty={!staySummary(stay)}
+            >
+              {staySummary(stay) || "Not added yet"}
+            </DetailField>
+          ))}
+        {singleTrip.carRental && singleTrip.carRental.enabled && (
+          <DetailField label="CAR RENTAL">
+            {[
+              singleTrip.carRental.company,
+              singleTrip.carRental.carType,
+              singleTrip.carRental.reservationNumber &&
+                "Booking " + singleTrip.carRental.reservationNumber,
+              singleTrip.carRental.paidAmount &&
+                (singleTrip.carRental.currency || "€") +
+                  singleTrip.carRental.paidAmount,
+            ]
+              .filter(Boolean)
+              .join(" · ") || "Not added yet"}
+          </DetailField>
         )}
-        {singleTrip.checkinDate && (
-          <div>
-            <div className="tripDetailsFieldTitle">CHECK-IN</div>
-            <div className="tripDetailsFieldContent">
-              <i className="far fa-calendar-alt"></i>
-              {singleTrip.checkinDate.slice(8, 10)}.
-              {new Date(singleTrip.checkinDate).toLocaleString("default", {
-                month: "short",
-              })}
-            </div>
-            {singleTrip.checkinTime && (
-              <div>
-                <div className="tripDetailsFieldTitle">TIME</div>
-                <div className="tripDetailsFieldContent">
-                  <i className="far fa-clock"></i>
-                  {singleTrip.checkinTime}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {singleTrip.checkoutDate && (
-          <div>
-            <div className="tripDetailsFieldTitle">CHECK-OUT</div>
-            <div className="tripDetailsFieldContent">
-              <i className="far fa-calendar-alt"></i>
-              {singleTrip.checkoutDate.slice(8, 10)}.
-              {new Date(singleTrip.checkoutDate).toLocaleString("default", {
-                month: "short",
-              })}
-            </div>
-            {singleTrip.checkoutTime && (
-              <div>
-                <div className="tripDetailsFieldTitle">TIME</div>
-                <div className="tripDetailsFieldContent">
-                  <i className="far fa-clock"></i>
-                  {singleTrip.checkoutTime}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {singleTrip.sightseeings.length !== 0 && (
-          <div>
-            <div className="tripDetailsFieldTitle">SIGHTSEEINGS</div>
-            <div className="tripDetailsFieldContent">
-              {singleTrip.sightseeings.map((sightseeing, index) => {
-                if (singleTrip.sightseeings.length === index + 1) {
-                  return sightseeing.sightseeing;
-                }
-                return sightseeing.sightseeing + ", ";
-              })}
-            </div>
-          </div>
-        )}
-        {singleTrip.expenses.length !== 0 && (
-          <div>
-            <div className="tripDetailsFieldTitle">EXPENSES</div>
-            <div className="tripDetailsFieldContent">{sumFunction()}</div>
-          </div>
-        )}
-        {singleTrip.notes && (
-          <div>
-            <div className="tripDetailsFieldTitle">NOTES</div>
-            <div className="tripDetailsFieldContent">{singleTrip.notes}</div>
-          </div>
-        )}
+        <DetailField label="CHECK-IN" isEmpty={!singleTrip.checkinDate}>
+          <i className="far fa-calendar-alt"></i>
+          {formatDate(singleTrip.checkinDate)}
+          {singleTrip.checkinTime && ` · ${singleTrip.checkinTime}`}
+        </DetailField>
+        <DetailField label="CHECK-OUT" isEmpty={!singleTrip.checkoutDate}>
+          <i className="far fa-calendar-alt"></i>
+          {formatDate(singleTrip.checkoutDate)}
+          {singleTrip.checkoutTime && ` · ${singleTrip.checkoutTime}`}
+        </DetailField>
+        <DetailField
+          label="SIGHTSEEINGS"
+          isEmpty={!singleTrip.sightseeings || singleTrip.sightseeings.length === 0}
+        >
+          {singleTrip.sightseeings && singleTrip.sightseeings.length
+            ? singleTrip.sightseeings.map((item) => item.sightseeing).join(", ")
+            : "Not added yet"}
+        </DetailField>
+        <DetailField
+          label="EXPENSES"
+          isEmpty={!singleTrip.expenses || singleTrip.expenses.length === 0}
+        >
+          {singleTrip.expenses && singleTrip.expenses.length
+            ? sumFunction()
+            : "Not added yet"}
+        </DetailField>
+        <DetailField label="NOTES" isEmpty={!notesSummary(singleTrip.notes)}>
+          {notesSummary(singleTrip.notes) || "Not added yet"}
+        </DetailField>
       </motion.div>
       <div className="tripDetailsFooter">
         <Link className="editLink" to={`/myTrips/${singleTrip.id}/edit`}>

@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
+    "airports": "^1.0.0",
     "framer-motion": "^4.1.17",
     "mapbox-gl": "^2.2.0",
     "react": "^17.0.2",
@@ -14,13 +15,15 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
+    "tz-lookup": "^6.1.25",
     "use-supercluster": "^0.2.9",
     "web-vitals": "^1.1.1",
     "worker-loader": "^3.0.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "HOST=127.0.0.1 NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "dev": "HOST=127.0.0.1 NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

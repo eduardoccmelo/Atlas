@@ -3,63 +3,92 @@ import { Link } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
 import useSupercluster from "use-supercluster";
 import {
-  addMarkerToLocalStorage,
   getMarkersFromLocalStorage,
+  saveMarkersToLocalStorage,
 } from "../services/myMarkersStorage";
-import {
-  addCountryCountToLocalStorage,
-  removeCountryCountFromLocalStorage,
-  getCountriesCountFromLocalStorage,
-} from "../services/countriesCountStorage";
 import TravelMap from "./TravelMap";
 import CountryOption from "./CountryOption";
 
 export default function WorldMap() {
   const [countries, setCountries] = useState([]);
-  const [numberOfVisitedCountries, setNumberOfVisitedCountries] = useState(0);
+  const [isLoadingCountries, setIsLoadingCountries] = useState(true);
+  const [countriesError, setCountriesError] = useState("");
+  const [mapError, setMapError] = useState(false);
   const [filterInputValue, setFilterInputValue] = useState("");
   const [markers, setMarkers] = useState([]);
   const [clickedCountry, setClickedCountry] = useState(null);
   const mapRef = useRef();
-  const percentage = (markers.length / 249) * 100;
+  const percentage = countries.length
+    ? (markers.length / countries.length) * 100
+    : 0;
 
-  let screenWidth = document.body.offsetWidth;
-  let mapZoom;
-  if (document.body.offsetWidth < 700) {
-    mapZoom = 0;
-  } else {
-    mapZoom = 1;
-  }
+  const isMobile = window.innerWidth <= 640;
 
   const [viewPort, setViewPort] = useState({
-    latitude: 16.123,
-    longitude: 18.123,
-    width: `${screenWidth - 30}px`,
-    height: "250px",
-    zoom: Number(mapZoom),
+    latitude: isMobile ? 39.5 : 20.123,
+    longitude: isMobile ? 20 : 10.123,
+    width: "100%",
+    height: isMobile ? "210px" : "420px",
+    zoom: isMobile ? 3.5 : 1.2,
   });
 
-  const filteredCountries =
-    countries.length > 0 &&
-    countries.filter((country) => {
-      return country.name
-        .toLowerCase()
-        .includes(filterInputValue.toLowerCase());
-    });
+  const filteredCountries = countries.filter((country) =>
+    country.name.toLowerCase().includes(filterInputValue.toLowerCase()),
+  );
 
   useEffect(() => {
-    fetch("https://restcountries.eu/rest/v2/all")
-      .then((res) => res.json())
+    const controller = new AbortController();
+
+    fetch(
+      "https://raw.githubusercontent.com/mledoze/countries/master/countries.json",
+      { signal: controller.signal },
+    )
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Country service returned ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
-        data.splice(33, 1);
-        setCountries(data);
-      });
+        const normalizedCountries = data
+          .filter(
+            (country) =>
+              country.name?.common &&
+              Array.isArray(country.latlng) &&
+              country.latlng.length === 2,
+          )
+          .map((country) => ({
+            id: country.cca2 || country.name.common,
+            name: country.name.common,
+            latlng: country.latlng,
+            flag: country.cca2
+              ? `https://flagcdn.com/w40/${country.cca2.toLowerCase()}.png`
+              : "",
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setCountries(normalizedCountries);
+      })
+      .catch((error) => {
+        if (error.name !== "AbortError") {
+          setCountriesError("Countries could not be loaded. Please try again.");
+        }
+      })
+      .finally(() => setIsLoadingCountries(false));
+
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
-    const myMarkers = getMarkersFromLocalStorage();
-    setMarkers(myMarkers);
-    setNumberOfVisitedCountries(getCountriesCountFromLocalStorage());
+    const uniqueMarkers = getMarkersFromLocalStorage().filter(
+      (marker, index, allMarkers) =>
+        marker &&
+        marker.name &&
+        Array.isArray(marker.latlng) &&
+        marker.latlng.length === 2 &&
+        allMarkers.findIndex((item) => item.name === marker.name) === index,
+    );
+    setMarkers(uniqueMarkers);
+    saveMarkersToLocalStorage(uniqueMarkers);
   }, []);
 
   useEffect(() => {
@@ -74,32 +103,40 @@ export default function WorldMap() {
     };
   }, []);
 
+  useEffect(() => {
+    const updateMapSize = () => {
+      setViewPort((current) => ({
+        ...current,
+        width: "100%",
+        height: window.innerWidth <= 640 ? "210px" : "420px",
+      }));
+    };
+
+    window.addEventListener("resize", updateMapSize);
+    return () => window.removeEventListener("resize", updateMapSize);
+  }, []);
+
   function handleClick(e, latlng, name) {
-    if (e.target.checked === true) {
-      setNumberOfVisitedCountries(numberOfVisitedCountries + 1);
-      setMarkers([...markers, { latlng, name }]);
-      addMarkerToLocalStorage({ latlng, name });
-      addCountryCountToLocalStorage();
-    } else {
-      setNumberOfVisitedCountries(numberOfVisitedCountries - 1);
-      const filterFunction = (country) => country.name !== name;
-      const filteredMarkers = markers.filter(filterFunction);
-      setMarkers(filteredMarkers);
-      removeMarkerFromLocalStorage(name);
-      removeCountryCountFromLocalStorage();
-    }
+    const updatedMarkers = e.target.checked
+      ? markers.some((marker) => marker.name === name)
+        ? markers
+        : [...markers, { latlng, name }]
+      : markers.filter((marker) => marker.name !== name);
+
+    setMarkers(updatedMarkers);
+    saveMarkersToLocalStorage(updatedMarkers);
   }
 
   let textContent;
-  if (numberOfVisitedCountries === 0 || numberOfVisitedCountries.length === 0) {
+  if (markers.length === 0) {
     textContent = "You didn't select any Country yet";
-  } else if (numberOfVisitedCountries === 1) {
-    textContent = `You have visited ${getCountriesCountFromLocalStorage()} Country in the World (${Math.round(
-      percentage
+  } else if (markers.length === 1) {
+    textContent = `You have visited 1 Country in the World (${Math.round(
+      percentage,
     )}%)`;
   } else {
-    textContent = `You have visited ${getCountriesCountFromLocalStorage()} Countries in the World (${Math.round(
-      percentage
+    textContent = `You have visited ${markers.length} Countries in the World (${Math.round(
+      percentage,
     )}%)`;
   }
 
@@ -112,14 +149,6 @@ export default function WorldMap() {
       return marker.name === name;
     });
     return isChecked;
-  }
-
-  function removeMarkerFromLocalStorage(tripName) {
-    const myMarkers = getMarkersFromLocalStorage();
-    const newMarkers = myMarkers.filter((marker) => {
-      return marker.name !== tripName;
-    });
-    localStorage.setItem("markerData", JSON.stringify(newMarkers));
   }
 
   const points = markers.map((marker) => ({
@@ -142,7 +171,7 @@ export default function WorldMap() {
     points,
     bounds,
     zoom: viewPort.zoom,
-    options: { radius: 40, maxZoom: 7 },
+    options: { radius: 40, maxZoom: 12 },
   });
 
   return (
@@ -161,6 +190,7 @@ export default function WorldMap() {
           supercluster={supercluster}
           clickedCountry={clickedCountry}
           setClickedCountry={setClickedCountry}
+          setMapError={setMapError}
           viewPort={viewPort}
           setViewPort={setViewPort}
         />
@@ -176,33 +206,41 @@ export default function WorldMap() {
         ></input>
       </div>
 
-      {filteredCountries.length === 0 && (
-        <div className="noResults">
-          <i className="fas fa-exclamation-circle"></i>NO RESULTS
-        </div>
-      )}
-
-      {filteredCountries &&
-        filteredCountries.map((country) => {
-          const { name, latlng, flag } = country;
-          return (
-            <CountryOption
-              key={name}
-              name={name}
-              latlng={latlng}
-              flag={flag}
-              handleClick={handleClick}
-              getCheckboxState={getCheckboxState}
-            />
-          );
-        })}
-      <div className="travelMapFooter">
-        <a href="#top" className="backToTopLink">
-          <div className="backToTopButton">
-            <i className="fas fa-arrow-up"></i>
+      <div className="countryList">
+        {mapError && (
+          <div className="noResults">
+            The map could not load. Check the Mapbox token in the .env file.
           </div>
-        </a>
-        <Link className="myTripsButtonLink" to="">
+        )}
+        {isLoadingCountries && (
+          <div className="noResults">LOADING COUNTRIES…</div>
+        )}
+        {countriesError && <div className="noResults">{countriesError}</div>}
+        {!isLoadingCountries &&
+          !countriesError &&
+          filteredCountries.length === 0 && (
+            <div className="noResults">
+              <i className="fas fa-exclamation-circle"></i>NO RESULTS
+            </div>
+          )}
+
+        {!countriesError &&
+          filteredCountries.map((country) => {
+            const { id, name, latlng, flag } = country;
+            return (
+              <CountryOption
+                key={id}
+                name={name}
+                latlng={latlng}
+                flag={flag}
+                handleClick={handleClick}
+                getCheckboxState={getCheckboxState}
+              />
+            );
+          })}
+      </div>
+      <div className="travelMapFooter">
+        <Link className="myTripsButtonLink" to="/">
           <button className="travelMapButtonHome">
             <i className="fas fa-home"></i>
           </button>

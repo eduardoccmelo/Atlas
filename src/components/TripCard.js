@@ -8,9 +8,11 @@ export default function TripCard({
   transportation,
   startDay,
   startMonth,
+  startYear,
   endDay,
   endMonth,
   endDate,
+  endYear,
 }) {
   function classTripDate() {
     const today = new Date();
@@ -31,8 +33,10 @@ export default function TripCard({
         transportation={transportation}
         startDay={startDay}
         startMonth={startMonth}
+        startYear={startYear}
         endDay={endDay}
         endMonth={endMonth}
+        endYear={endYear}
       />
       <Link to={`/myTrips/${id}`}>
         <button className="tripViewButton">View</button>

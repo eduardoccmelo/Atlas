@@ -2,8 +2,10 @@ export default function TransportIcon({
   transportation,
   startDay,
   startMonth,
+  startYear,
   endDay,
   endMonth,
+  endYear,
   name,
 }) {
   return (
@@ -46,13 +48,17 @@ export default function TransportIcon({
         )}
         <span className="tripName">{name}</span>
       </div>
-      <hr></hr>
+      <hr className="cardDivider"></hr>
       <div className="tripDates">
         <div className="tripStart">
-          {startDay}.{startMonth}
+          {startDay}
+          <span>{startMonth}</span>
+          {startYear}
         </div>
         <div className="tripEnd">
-          {endDay}.{endMonth}
+          {endDay}
+          <span>{endMonth}</span>
+          {endYear}
         </div>
       </div>
     </div>
