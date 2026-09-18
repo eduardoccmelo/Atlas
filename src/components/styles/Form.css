@@ -23,7 +23,15 @@
 .detailCollection { grid-column: 1 / -1; display: grid; gap: 12px; width: 100%; }
 .detailCard { padding: 15px; border: 1px solid #d5e5ea; border-radius: 12px; background: rgba(255, 255, 255, .58); }
 .detailCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--ocean); font-size: .72rem; letter-spacing: .08em; }
+.transportDetailTitle { display: flex; align-items: center; gap: 8px; }
+.transportTypeIcon { display: inline-grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; color: var(--paper); background: var(--teal); font-size: .85rem; box-shadow: 0 3px 8px rgba(12, 133, 128, .2); }
+.transportTypeIcon .fa-plane { margin-top: 2px; margin-left: 3px; }
+.transportTypeIcon .fa-bus, .transportTypeIcon .fa-train { margin-top: 1px; margin-left: 1px; }
 .detailFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rentalFields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rentalFields .pickupAddressField { grid-column: span 2; }
+.rentalFields .dropoffToggle { flex-direction: row; align-items: center; align-self: end; gap: 8px; min-height: 43px; padding-bottom: 10px; color: #334e68; font-size: .78rem; letter-spacing: 0; }
+.rentalFields .dropoffToggle input { flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; min-height: 18px; padding: 0; accent-color: var(--teal); }
 .transportFields { grid-template-columns: repeat(12, minmax(0, 1fr)); }
 .transportFields > label, .transportFields > .detailHint { grid-column: span 6; }
 .transportFields.isPlane > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
@@ -38,26 +46,31 @@
 .transportFields.isPlane > label:nth-of-type(10) { grid-column: 1 / span 4; grid-row: 4; }
 .transportFields.isPlane > label:nth-of-type(11) { grid-column: 5 / span 4; grid-row: 4; }
 .transportFields.isPlane .flightMetricDuration { grid-column: 9 / span 4; grid-row: 4; }
-.transportFields.isBus > label:nth-of-type(1), .transportFields.isTrain > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
-.transportFields.isBus > label:nth-of-type(2), .transportFields.isTrain > label:nth-of-type(2) { grid-column: 5 / span 4; grid-row: 1; }
-.transportFields.isTrain > label:nth-of-type(9) { grid-column: 9 / span 4; grid-row: 1; }
-.transportFields.isBus > label:nth-of-type(3) { grid-column: 1 / span 6; grid-row: 2; }
-.transportFields.isBus > label:nth-of-type(10) { grid-column: 7 / span 6; grid-row: 2; }
-.transportFields.isBus > label:nth-of-type(1) { grid-column: 1 / span 6; grid-row: 1; }
-.transportFields.isBus > label:nth-of-type(2) { grid-column: 7 / span 6; grid-row: 1; }
-.transportFields.isBus > label:nth-of-type(6) { grid-column: 1 / span 6; grid-row: 3; }
-.transportFields.isBus > label:nth-of-type(7) { grid-column: 7 / span 6; grid-row: 3; }
-.transportFields.isBus > label:nth-of-type(8) { grid-column: 1 / span 6; grid-row: 4; }
-.transportFields.isBus > label:nth-of-type(9) { grid-column: 7 / span 6; grid-row: 4; }
-.transportFields.isBus > label:nth-of-type(4) { grid-column: 1 / span 6; grid-row: 5; }
-.transportFields.isBus > label:nth-of-type(5) { grid-column: 7 / span 6; grid-row: 5; }
-.transportFields.isTrain > label:nth-of-type(3) { grid-column: 1 / span 6; grid-row: 2; }
-.transportFields.isTrain > label:nth-of-type(4) { grid-column: 7 / span 6; grid-row: 2; }
-.transportFields.isTrain > label:nth-of-type(5) { grid-column: 1 / span 6; grid-row: 3; }
-.transportFields.isTrain > label:nth-of-type(6) { grid-column: 7 / span 6; grid-row: 3; }
-.transportFields.isTrain > label:nth-of-type(7) { grid-column: 1 / span 6; grid-row: 4; }
-.transportFields.isTrain > label:nth-of-type(8) { grid-column: 7 / span 6; grid-row: 4; }
-.flightMetricDistance input, .flightMetricDuration input { color: #829ab1; background: rgba(222, 235, 240, .8); cursor: not-allowed; }
+.transportFields.isTrain > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
+.transportFields.isTrain > label:nth-of-type(2) { grid-column: 5 / span 4; grid-row: 1; }
+.transportFields.isTrain > label:nth-of-type(3) { grid-column: 9 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(2) { grid-column: 5 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(3) { grid-column: 9 / span 4; grid-row: 1; }
+.transportFields.isBus > label:nth-of-type(6) { grid-column: 1 / span 4; grid-row: 2; }
+.transportFields.isBus > label:nth-of-type(7) { grid-column: 5 / span 4; grid-row: 2; }
+.transportFields.isBus > label:nth-of-type(12) { grid-column: 9 / span 4; grid-row: 2; }
+.transportFields.isBus > label:nth-of-type(8) { grid-column: 1 / span 4; grid-row: 3; }
+.transportFields.isBus > label:nth-of-type(9) { grid-column: 5 / span 4; grid-row: 3; }
+.transportFields.isBus .busMetricDuration { grid-column: 9 / span 4; grid-row: 3; }
+.transportFields.isBus > label:nth-of-type(4) { grid-column: 1 / span 4; grid-row: 4; }
+.transportFields.isBus > label:nth-of-type(5) { grid-column: 5 / span 4; grid-row: 4; }
+.transportFields.isBus .busMetricDistance { grid-column: 9 / span 4; grid-row: 4; }
+.transportFields.isTrain > label:nth-of-type(6) { grid-column: 1 / span 4; grid-row: 2; }
+.transportFields.isTrain > label:nth-of-type(7) { grid-column: 5 / span 4; grid-row: 2; }
+.transportFields.isTrain > label:nth-of-type(12) { grid-column: 9 / span 4; grid-row: 2; }
+.transportFields.isTrain > label:nth-of-type(8) { grid-column: 1 / span 4; grid-row: 3; }
+.transportFields.isTrain > label:nth-of-type(9) { grid-column: 5 / span 4; grid-row: 3; }
+.transportFields.isTrain .trainMetricDuration { grid-column: 9 / span 4; grid-row: 3; }
+.transportFields.isTrain > label:nth-of-type(4) { grid-column: 1 / span 4; grid-row: 4; }
+.transportFields.isTrain > label:nth-of-type(5) { grid-column: 5 / span 4; grid-row: 4; }
+.transportFields.isTrain .trainMetricDistance { grid-column: 9 / span 4; grid-row: 4; }
+.flightMetricDistance input, .flightMetricDuration input, .busMetricDistance input, .busMetricDuration input, .trainMetricDistance input, .trainMetricDuration input { color: #829ab1; background: rgba(222, 235, 240, .8); cursor: not-allowed; }
 .flightTimeError { margin: 0; padding: 10px 12px; border: 1px solid rgba(179, 58, 50, .35); border-radius: 8px; color: #9f2f2a; background: rgba(255, 235, 232, .9); font-size: .82rem; font-weight: 700; }
 .transportFields.isPlane > label:nth-of-type(7), .transportFields.isPlane > label:nth-of-type(8) { display: none; }
 .detailFields label { display: flex; flex-direction: column; gap: 5px; color: #486581; font-size: .66rem; font-weight: 850; letter-spacing: .06em; }
@@ -100,15 +113,14 @@
   accent-color: var(--teal);
 }
 .TripForm input:focus, .TripForm select:focus, .TripForm textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(12, 133, 128, 0.16); }
-.TripForm .flightMetricDistance input, .TripForm .flightMetricDuration input { color: #627d98; background: #e7eef1; border-color: #d5e1e6; cursor: not-allowed; }
+.TripForm .flightMetricDistance input, .TripForm .flightMetricDuration input, .TripForm .busMetricDistance input, .TripForm .busMetricDuration input, .TripForm .trainMetricDistance input, .TripForm .trainMetricDuration input { color: #627d98; background: #e7eef1; border-color: #d5e1e6; cursor: not-allowed; }
 .TripForm textarea { min-height: 112px; resize: vertical; }
 .sightSeeingHeader label, .expensesHeader label { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; color: #486581; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.085em; }
-.sightSeeingHeader input, .expensesHeader input, .expensesHeader select { grid-row: 2; }
 .expensesHeader label { grid-template-columns: minmax(0, 1fr) 82px 58px auto; }
 .addSightseeingButton, .addExpenseButton, .formTripButton, .tripCancelButton {
   min-height: 42px; padding: 0 16px; border-radius: 10px; cursor: pointer; font-weight: 800; transition: transform 160ms ease, filter 160ms ease;
 }
-.addSightseeingButton, .addExpenseButton { grid-row: 2; color: #fff; background: var(--ocean); }
+.addSightseeingButton, .addExpenseButton { grid-row: auto; color: #fff; background: var(--ocean); }
 .sightseeingItem, .expenseItem {
   position: relative; display: flex; align-items: center; min-height: 38px; margin-top: 10px; padding: 8px 44px 8px 12px;
   border: 1px solid #d7e5ec; border-radius: 10px; color: #334e68; background: rgba(244, 250, 252, 0.92); font-size: 0.9rem;
@@ -133,6 +145,7 @@
   .formTransport .transportFields { grid-template-columns: 1fr !important; }
   .formTransport .transportFields > label { grid-column: auto !important; grid-row: auto !important; }
   .detailFieldWide { grid-column: auto; }
+  .rentalFields .pickupAddressField { grid-column: auto; }
 }
 @media (max-width: 460px) {
   .formHeader, .formTravelDates, .formTransport, .formAccommodation, .formSightseeings, .formExpenses, .formNotes { padding: 17px; }

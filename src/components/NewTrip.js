@@ -32,8 +32,14 @@ export default function NewTrip() {
     carType: "",
     reservationNumber: "",
     address: "",
-    pickupAt: "",
-    returnAt: "",
+    pickupDate: "",
+    dropoffDate: "",
+    pickupTime: "",
+    dropoffTime: "",
+    transmission: "",
+    fuelType: "",
+    differentDropoffAddress: false,
+    dropoffAddress: "",
   });
   const history = useHistory();
 

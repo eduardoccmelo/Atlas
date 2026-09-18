@@ -13,8 +13,14 @@ const emptyCarRental = {
   carType: "",
   reservationNumber: "",
   address: "",
-  pickupAt: "",
-  returnAt: "",
+  pickupDate: "",
+  dropoffDate: "",
+  pickupTime: "",
+  dropoffTime: "",
+  transmission: "",
+  fuelType: "",
+  differentDropoffAddress: false,
+  dropoffAddress: "",
 };
 
 export default function EditTrip() {

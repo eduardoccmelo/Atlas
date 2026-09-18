@@ -1,5 +1,4 @@
 export default function TransportIcon({
-  transportation,
   startDay,
   startMonth,
   startYear,
@@ -8,57 +7,32 @@ export default function TransportIcon({
   endYear,
   name,
 }) {
+  const monthNumber = (month) => {
+    const months = {
+      jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+      jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+    };
+    return months[month?.slice(0, 3).toLowerCase()] || month;
+  };
+
   return (
     <div>
-      <div className="tripCardInfo">
-        {transportation === "car" && (
-          <span>
-            <i className="fas fa-car"></i>
-          </span>
-        )}
-        {transportation === "bus" && (
-          <span>
-            <i className="fas fa-bus"></i>
-          </span>
-        )}
-        {transportation === "train" && (
-          <span>
-            <i className="fas fa-train"></i>
-          </span>
-        )}
-        {transportation === "plane" && (
-          <span>
-            <i className="fas fa-plane"></i>
-          </span>
-        )}
-        {transportation === "other" && (
-          <span>
-            <i className="fas fa-suitcase"></i>
-          </span>
-        )}
-        {transportation === "none" && (
-          <span>
-            <i className="fas fa-suitcase"></i>
-          </span>
-        )}
-        {transportation === "" && (
-          <span>
-            <i className="fas fa-suitcase"></i>
-          </span>
-        )}
-        <span className="tripName">{name}</span>
+      <div className="tripCardContent">
+        <div className="tripCardInfo">
+          <span className="tripName">{name}</span>
+        </div>
       </div>
       <hr className="cardDivider"></hr>
       <div className="tripDates">
         <div className="tripStart">
-          {startDay}
-          <span>{startMonth}</span>
-          {startYear}
+          <span className="tripDateDay">{startDay}</span>
+          <span className="tripDateMonth" data-month-number={monthNumber(startMonth)}>{startMonth}</span>
+          <span className="tripDateYear">{startYear}</span>
         </div>
         <div className="tripEnd">
-          {endDay}
-          <span>{endMonth}</span>
-          {endYear}
+          <span className="tripDateDay">{endDay}</span>
+          <span className="tripDateMonth" data-month-number={monthNumber(endMonth)}>{endMonth}</span>
+          <span className="tripDateYear">{endYear}</span>
         </div>
       </div>
     </div>
