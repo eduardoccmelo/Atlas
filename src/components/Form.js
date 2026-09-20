@@ -49,6 +49,78 @@ function distanceInKm(origin, destination) {
   );
 }
 
+function formatDateForInput(value) {
+  if (!value) return "";
+  const [year, month, day] = value.split("-");
+  return year && month && day ? `${day}/${month}/${year}` : "";
+}
+
+function parseNumericDate(value) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length !== 8) return "";
+  const day = Number(digits.slice(0, 2));
+  const month = Number(digits.slice(2, 4));
+  const year = Number(digits.slice(4, 8));
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  )
+    return "";
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
+function NumericDateInput({ value, onChange, min, max, id, required }) {
+  const [displayValue, setDisplayValue] = useState(formatDateForInput(value));
+
+  useEffect(() => {
+    setDisplayValue(formatDateForInput(value));
+  }, [value]);
+
+  const formatWhileTyping = (rawValue) => {
+    const digits = rawValue.replace(/\D/g, "").slice(0, 8);
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+  };
+
+  function handleChange(event) {
+    const formatted = formatWhileTyping(event.target.value);
+    setDisplayValue(formatted);
+    if (!formatted) {
+      onChange("");
+      return;
+    }
+    const isoDate = parseNumericDate(formatted);
+    if (isoDate && (!min || isoDate >= min) && (!max || isoDate <= max)) {
+      onChange(isoDate);
+    }
+  }
+
+  function handleBlur() {
+    const isoDate = parseNumericDate(displayValue);
+    if (!isoDate || (min && isoDate < min) || (max && isoDate > max)) {
+      setDisplayValue(formatDateForInput(value));
+    }
+  }
+
+  return (
+    <input
+      id={id}
+      type="text"
+      inputMode="numeric"
+      autoComplete="off"
+      placeholder="DD/MM/YYYY"
+      pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
+      value={displayValue}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      required={required}
+    />
+  );
+}
+
 export default function Form({
   handleOnSubmit,
   handleSightseeingOnClick,
@@ -545,30 +617,24 @@ export default function Form({
         <div className="formTravelDates">
           <label className="tripStartForm" htmlFor="tripStart">
             START
-            <input
-              onChange={(e) => {
-                setInputTripStart(e.target.value);
-              }}
+            <NumericDateInput
+              onChange={setInputTripStart}
               value={inputTripStart}
               id="tripStart"
-              type="date"
               max={inputTripEnd}
               required
-            ></input>
+            />
           </label>
 
           <label className="tripEndForm" htmlFor="tripEnd">
             END
-            <input
-              onChange={(e) => {
-                setInputTripEnd(e.target.value);
-              }}
+            <NumericDateInput
+              onChange={setInputTripEnd}
               value={inputTripEnd}
               id="tripEnd"
-              type="date"
               min={inputTripStart}
               required
-            ></input>
+            />
           </label>
         </div>
       </div>
@@ -722,16 +788,15 @@ export default function Form({
                   {leg.type === "plane" && (
                     <label className="flightDateField">
                       DEPARTURE DATE
-                      <input
-                        type="date"
+                      <NumericDateInput
                         min={inputTripStart}
                         max={inputTripEnd}
                         value={leg.departureDate || ""}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           updateTransportLeg(
                             index,
                             "departureDate",
-                            e.target.value,
+                            value,
                           )
                         }
                       />
@@ -741,32 +806,30 @@ export default function Form({
                     <>
                       <label>
                         DEPARTURE DATE
-                        <input
-                          type="date"
+                        <NumericDateInput
                           min={inputTripStart}
                           max={inputTripEnd}
                           value={leg.departureDate || ""}
-                          onChange={(e) =>
+                          onChange={(value) =>
                             updateTransportLeg(
                               index,
                               "departureDate",
-                              e.target.value,
+                              value,
                             )
                           }
                         />
                       </label>
                       <label>
                         ARRIVAL DATE
-                        <input
-                          type="date"
+                        <NumericDateInput
                           min={inputTripStart}
                           max={inputTripEnd}
                           value={leg.arrivalDate || ""}
-                          onChange={(e) =>
+                          onChange={(value) =>
                             updateTransportLeg(
                               index,
                               "arrivalDate",
-                              e.target.value,
+                              value,
                             )
                           }
                         />
@@ -777,32 +840,30 @@ export default function Form({
                     <>
                       <label>
                         DEPARTURE DATE
-                        <input
-                          type="date"
+                        <NumericDateInput
                           min={inputTripStart}
                           max={inputTripEnd}
                           value={leg.departureDate || ""}
-                          onChange={(e) =>
+                          onChange={(value) =>
                             updateTransportLeg(
                               index,
                               "departureDate",
-                              e.target.value,
+                              value,
                             )
                           }
                         />
                       </label>
                       <label>
                         ARRIVAL DATE
-                        <input
-                          type="date"
+                        <NumericDateInput
                           min={inputTripStart}
                           max={inputTripEnd}
                           value={leg.arrivalDate || ""}
-                          onChange={(e) =>
+                          onChange={(value) =>
                             updateTransportLeg(
                               index,
                               "arrivalDate",
-                              e.target.value,
+                              value,
                             )
                           }
                         />
@@ -1010,25 +1071,23 @@ export default function Form({
               </label>
               <label>
                 PICK-UP DATE
-                <input
-                  type="date"
+                <NumericDateInput
                   min={inputTripStart}
                   max={inputTripEnd}
                   value={carRental.pickupDate || ""}
-                  onChange={(e) =>
-                    setCarRental({ ...carRental, pickupDate: e.target.value })
+                  onChange={(value) =>
+                    setCarRental({ ...carRental, pickupDate: value })
                   }
                 />
               </label>
               <label>
                 DROP-OFF DATE
-                <input
-                  type="date"
+                <NumericDateInput
                   min={inputTripStart}
                   max={inputTripEnd}
                   value={carRental.dropoffDate || ""}
-                  onChange={(e) =>
-                    setCarRental({ ...carRental, dropoffDate: e.target.value })
+                  onChange={(value) =>
+                    setCarRental({ ...carRental, dropoffDate: value })
                   }
                 />
               </label>
@@ -1197,16 +1256,15 @@ export default function Form({
                   </label>
                   <label>
                     CHECK-IN DATE
-                    <input
-                      type="date"
+                    <NumericDateInput
                       min={inputTripStart}
                       max={inputTripEnd}
                       value={stay.checkinDate}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         updateAccommodation(
                           index,
                           "checkinDate",
-                          e.target.value,
+                          value,
                         )
                       }
                     />
@@ -1227,16 +1285,15 @@ export default function Form({
                   </label>
                   <label>
                     CHECK-OUT DATE
-                    <input
-                      type="date"
+                    <NumericDateInput
                       min={inputTripStart}
                       max={inputTripEnd}
                       value={stay.checkoutDate}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         updateAccommodation(
                           index,
                           "checkoutDate",
-                          e.target.value,
+                          value,
                         )
                       }
                     />

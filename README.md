@@ -1,72 +1,100 @@
-## Eduardo's Capstone Project 2021
+# Atlas — Travel Organizer
 
-# Getting Started with Create React App
+Atlas is a personal travel organizer for planning trips, keeping the details of each journey together, and visualizing the countries you have visited. It is a responsive, visual-first single-page application that works on desktop and mobile screens.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Highlights
 
-## Available Scripts
+- Create, view, edit, and remove trips.
+- Keep destination, start, and end dates together at the top of every trip.
+- Build detailed transport entries for flights, buses, and trains.
+- Add multiple transport legs, including flight connections.
+- Autocomplete airports and cities, calculate travel distance, and calculate duration from the entered dates and times.
+- Account for airport time zones when calculating flight duration.
+- Record optional car rental and accommodation details.
+- Maintain sightseeing items, expenses, and free-form notes for each trip.
+- Browse a world map, select visited countries, search the country list, and see your visited-country total.
+- Store trip data and visited countries locally in the browser, so no account is required.
 
-In the project directory, you can run:
+## Travel planning details
 
-### `npm start`
+### Trips
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Each trip uses a boarding-pass-inspired card with quick actions for viewing, editing, and deleting. The card resolves a destination to its country and displays that country’s flag; when the place cannot be resolved, it uses a neutral world-map image instead.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Transport
 
-### `npm test`
+The transport form supports multiple entries and keeps fields relevant to the selected travel type.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Flight:** airline, booking reference, flight number, seats, airports, departure date/time, arrival time, calculated distance, and time-zone-aware duration.
+- **Bus and train:** operator, booking/ticket details, seats, cities, dates/times, calculated duration, and distance.
+- **Car rental:** company, vehicle, reservation number, pick-up/drop-off dates and times, fuel, transmission, and optional alternate drop-off location.
 
-### `npm run build`
+### Accommodation and trip notes
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Add more than one accommodation, with booking provider, reservation, dates, times, and address. Sightseeings, expenses, and a free-text notes area make it easy to keep the smaller details in one place.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Tech stack
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- React 17 and React Router
+- Create React App
+- Mapbox GL via `react-map-gl`
+- `use-supercluster` for map marker clustering
+- `airports` and `tz-lookup` for airport and time-zone data
+- Framer Motion for interface transitions
+- Browser `localStorage` for persistence
 
-### `npm run eject`
+## Run locally
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Requirements
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Node.js 16+ is recommended.
+- A Mapbox public access token is required for the interactive map and city autocomplete.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Install
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+```bash
+npm install
+```
 
-## Learn More
+Create a `.env` file in the project root:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```dotenv
+REACT_APP_MAPBOX_KEY=your_mapbox_public_token
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Start the development server:
 
-### Code Splitting
+```bash
+npm run dev
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The app runs at [http://localhost:3000](http://localhost:3000).
 
-### Analyzing the Bundle Size
+## Available commands
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Starts the local development server. |
+| `npm start` | Starts the same Create React App development server. |
+| `npm run build` | Produces an optimized production build in `build/`. |
+| `npm test` | Starts the test runner in watch mode. |
 
-### Making a Progressive Web App
+## Data and privacy
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Atlas currently has no backend or user account. Trips, expenses, and map selections are kept in the current browser’s local storage. Clearing the browser’s site data removes this information.
 
-### Advanced Configuration
+## Project structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```text
+src/
+├── components/   # Screens, cards, forms, map, and UI elements
+├── images/       # Atlas assets and fallback imagery
+├── services/     # Local-storage persistence helpers
+└── App.js        # Application routes
+```
 
-### Deployment
+## Notes for contributors
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Keep displayed dates in `DD/MM/AAAA`; data is stored internally as `AAAA-MM-DD` so calculations stay reliable.
+- Do not commit `.env` or Mapbox tokens.
+- Check the responsive form and trip-card layouts at narrow widths when changing UI styles.
