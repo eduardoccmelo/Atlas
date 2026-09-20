@@ -29,7 +29,7 @@ export default function WorldMap() {
     longitude: isMobile ? 20 : 10.123,
     width: "100%",
     height: isMobile ? "210px" : "420px",
-    zoom: isMobile ? 2.2 : 1.05,
+    zoom: isMobile ? 1.0 : 0.5,
   });
 
   const filteredCountries = countries.filter((country) =>
