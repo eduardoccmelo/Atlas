@@ -9,8 +9,11 @@ import Trip from "./components/Trip";
 import WorldMap from "./components/WorldMap";
 import Logo from "./components/Logo";
 import PageNotFound from "./components/PageNotFound";
+import { initializeDemoData } from "./services/seedData";
 
 function App() {
+  initializeDemoData();
+
   return (
     <Router>
       <div className="App">

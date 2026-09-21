@@ -27,6 +27,7 @@ export default function EditTrip() {
   const history = useHistory();
   const { id } = useParams();
   const [inputDestinationName, setInputDestinationName] = useState("");
+  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [inputTripStart, setInputTripStart] = useState("");
   const [inputTripEnd, setInputTripEnd] = useState("");
   const [inputTransportType, setInputTransportType] = useState("");
@@ -57,6 +58,7 @@ export default function EditTrip() {
 
     editSingleTripFromLocalStorage(id, {
       name: inputDestinationName,
+      destinationCoordinates,
       start: inputTripStart,
       end: inputTripEnd,
       transportation: mainLeg.type || inputTransportType,
@@ -79,7 +81,8 @@ export default function EditTrip() {
 
   useEffect(() => {
     const myTrip = getSingleTripFromLocalStorage(id);
-    setInputDestinationName(myTrip.name);
+    setInputDestinationName(String(myTrip.name || "").split(" — ")[0]);
+    setDestinationCoordinates(myTrip.destinationCoordinates || null);
     setInputTripStart(myTrip.start);
     setInputTripEnd(myTrip.end);
     setInputTransportType(myTrip.transportation);
@@ -146,12 +149,12 @@ export default function EditTrip() {
     setCarRental(myTrip.carRental || emptyCarRental);
   }, [id]);
 
-  function handleSightseeingOnClick(e) {
+  function handleSightseeingOnClick(e, coordinates = null) {
     e.preventDefault();
     if (inputSightseeing !== "") {
       setAllSightseeings([
         ...allSightseeings,
-        { sightseeing: inputSightseeing },
+        { sightseeing: inputSightseeing, coordinates },
       ]);
     }
     setInputSightseeing("");
@@ -184,6 +187,7 @@ export default function EditTrip() {
         handleExpenseOnClick={handleExpenseOnClick}
         inputDestinationName={inputDestinationName}
         setInputDestinationName={setInputDestinationName}
+        setDestinationCoordinates={setDestinationCoordinates}
         inputTripStart={inputTripStart}
         setInputTripStart={setInputTripStart}
         inputTripEnd={inputTripEnd}

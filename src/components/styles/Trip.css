@@ -1,5 +1,6 @@
+/* Trip details layout v2 */
 .TripDetails {
-  max-width: 800px;
+  max-width: 880px;
   margin: 0 auto;
 }
 .tripDetailsHeader {
@@ -21,6 +22,9 @@
   background: var(--paper);
 }
 .tripDetailsTitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 18px;
   color: #fff;
   font-size: clamp(1.5rem, 4vw, 2.25rem);
@@ -28,51 +32,313 @@
   letter-spacing: -0.04em;
   text-transform: uppercase;
 }
+.tripDetailsTitle img {
+  width: 40px;
+  height: 27px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(5, 27, 42, 0.2);
+}
 .tripDetailsContent {
+  display: grid;
+  gap: 16px;
+}
+.tripOverviewCard,
+.tripDetailSection {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+  background: rgba(234, 246, 248, 0.92);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+.tripOverviewCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+}
+.tripOverviewCard > i {
+  color: var(--teal);
+  font-size: 1rem;
+}
+.tripOverviewDate {
+  display: grid;
+  gap: 5px;
+}
+.tripOverviewDate:last-child {
+  text-align: right;
+}
+.tripOverviewDate span,
+.tripInfoItem > span,
+.tripPlanningCard > p,
+.tripEntryHeading p,
+.tripDetailSectionEyebrow {
+  margin: 0;
+  color: #486581;
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+.tripOverviewDate strong {
+  color: var(--ink);
+  font-size: 1.02rem;
+}
+.tripDetailSection {
+  padding: 18px 22px 22px;
+}
+.tripDetailSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.tripDetailSectionIcon,
+.tripEntryIcon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--paper);
+  background: var(--teal);
+  box-shadow: 0 4px 10px rgba(12, 133, 128, 0.2);
+}
+.tripDetailSectionEyebrow {
+  margin-bottom: 2px;
+  font-size: 0.58rem;
+}
+.tripDetailSection h3 {
+  margin: 0;
+  color: var(--ocean);
+  font-size: 1.05rem;
+}
+.tripDetailSectionCount {
+  min-width: 24px;
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 99px;
+  color: var(--ocean);
+  background: rgba(12, 133, 128, 0.12);
+  font-size: 0.74rem;
+  font-weight: 850;
+  text-align: center;
+}
+.tripEntryCollection {
+  display: grid;
+  gap: 12px;
+}
+.tripEntryCard {
+  padding: 14px;
+  border: 1px solid #d5e5ea;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.64);
+}
+.tripEntryHeading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+}
+.tripEntryIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+}
+.tripEntryHeading p {
+  margin-bottom: 2px;
+  font-size: 0.58rem;
+}
+.tripEntryHeading h4 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.94rem;
+  text-transform: capitalize;
+}
+.tripRoute {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  color: var(--ocean);
+  background: rgba(220, 238, 243, 0.58);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+.tripRoute span:last-child {
+  text-align: right;
+}
+.tripRoute > i {
+  color: var(--teal);
+}
+.tripRoute.isEmpty,
+.tripInfoItem.isEmpty strong,
+.tripEmptyText,
+.tripEmptyState,
+.tripNotes.isEmpty {
+  color: #829ab1;
+  font-style: italic;
+  font-weight: 500;
+}
+.tripInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.tripInfoItem {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(203, 221, 232, 0.8);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.62);
+}
+.tripInfoItem > span {
+  font-size: 0.57rem;
+}
+.tripInfoItem strong {
+  overflow-wrap: anywhere;
+  color: #334e68;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+.tripEntryFootnote {
+  margin: 10px 1px 0;
+  color: #627d98;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.tripRentalCard {
+  margin-top: 12px;
+}
+.tripEmptyState {
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed #c7dce5;
+  border-radius: 10px;
+  text-align: center;
+}
+.tripPlanningGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
-.tripDetailsContent > div {
+.tripPlanningCard {
+  min-height: 112px;
+  padding: 14px;
+  border: 1px solid #d5e5ea;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.64);
+}
+.tripPlanningCard > p {
+  margin-bottom: 10px;
+}
+.tripPlanningCard ul {
   display: grid;
-  grid-template-columns: minmax(112px, 0.72fr) minmax(0, 1.28fr);
-  min-height: 72px;
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 14px;
-  background: var(--paper);
-  box-shadow: 0 12px 30px rgba(5, 27, 42, 0.15);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.tripDetailsContent > div > div {
-  display: flex;
-  align-items: center;
-  min-width: 0;
+.tripPlanningCard li {
+  color: #334e68;
+  font-size: 0.84rem;
 }
-.tripDetailItem.isEmpty { background: rgba(244, 250, 252, 0.78); }
-.tripDetailItem.isEmpty .tripDetailsFieldContent { color: #829ab1; font-style: italic; }
-.tripDetailsFieldTitle {
-  padding: 14px 12px;
-  color: #486581;
-  background: rgba(220, 238, 243, 0.7);
-  font-size: 0.67rem;
-  font-weight: 850;
-  letter-spacing: 0.07em;
-}
-.tripDetailsFieldContent {
-  display: flex;
-  align-items: center;
-  padding: 12px 14px;
-  color: var(--ink);
-  font-size: 0.92rem;
-  overflow-wrap: anywhere;
-}
-.tripDetailsFieldContent i {
+.tripPlanningCard li::before {
+  content: "•";
   margin-right: 7px;
   color: var(--teal);
 }
-.capitalize {
-  text-transform: capitalize;
+.tripExpenseList {
+  display: grid;
+  gap: 7px;
+}
+.tripExpenseList span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #334e68;
+  font-size: 0.84rem;
+}
+.tripExpenseList b {
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid #d5e5ea;
+  color: var(--ocean);
+  font-size: 0.86rem;
+}
+.tripNotes {
+  min-height: 72px;
+  padding: 13px 14px;
+  border: 1px solid #d5e5ea;
+  border-radius: 12px;
+  color: #334e68;
+  background: rgba(255, 255, 255, 0.64);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.tripLocationMap {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 18px;
+  background: rgba(234, 246, 248, 0.92);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+.tripLocationMapHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 22px 14px;
+}
+.tripLocationMapHeader h3 {
+  margin: 0;
+  color: var(--ocean);
+  font-size: 1.05rem;
+}
+.tripLocationMapCanvas {
+  overflow: hidden;
+  border-top: 1px solid #d5e5ea;
+  border-bottom: 1px solid #d5e5ea;
+}
+.tripLocationPin {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 2px solid var(--paper);
+  border-radius: 50% 50% 50% 0;
+  color: var(--paper);
+  background: var(--teal);
+  box-shadow: 0 4px 10px rgba(5, 27, 42, 0.28);
+  cursor: pointer;
+  transform: rotate(-45deg);
+}
+.tripLocationPin i {
+  transform: rotate(45deg);
+}
+.tripLocationMap .mapboxgl-popup-close-button {
+  color: #fff;
+  font-size: 19px;
+  line-height: 20px;
+}
+.tripLocationMap .mapboxgl-popup-close-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .12);
+}
+.tripLocationMapHint {
+  margin: 0;
+  padding: 10px 22px;
+  color: #627d98;
+  font-size: 0.76rem;
 }
 .tripDetailsFooter {
   display: flex;
@@ -104,11 +370,50 @@
 .editTripCancelButton:hover {
   transform: translateY(-2px);
 }
-@media (max-width: 600px) {
-  .tripDetailsContent {
+
+@media (max-width: 680px) {
+  .tripInfoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 460px) {
+  .tripOverviewCard,
+  .tripDetailSection {
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+  .tripOverviewCard {
+    gap: 10px;
+  }
+  .tripOverviewDate strong {
+    font-size: 0.9rem;
+  }
+  .tripPlanningGrid,
+  .tripInfoGrid {
     grid-template-columns: 1fr;
   }
-  .tripDetailsContent > div {
-    grid-template-columns: 116px 1fr;
+  .tripRoute {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    text-align: left;
+  }
+  .tripRoute > i {
+    transform: rotate(90deg);
+  }
+  .tripRoute span:last-child {
+    text-align: left;
+  }
+  .tripDetailsFooter {
+    justify-content: stretch;
+  }
+  .editLink,
+  .editTripButton,
+  .editTripCancelButton {
+    flex: 1;
+  }
+  .editTripButton,
+  .editTripCancelButton {
+    width: 100%;
+    padding: 0 10px;
   }
 }

@@ -83,6 +83,10 @@ The app runs at [http://localhost:3000](http://localhost:3000).
 
 Atlas currently has no backend or user account. Trips, expenses, and map selections are kept in the current browser’s local storage. Clearing the browser’s site data removes this information.
 
+### Demo data
+
+On a fresh browser profile, Atlas adds a small set of sample trips and visited countries so the cards, forms, and map can be explored immediately. Existing `localStorage` data is never replaced. To load the examples again after removing them, clear this site’s local storage and refresh the app.
+
 ## Project structure
 
 ```text

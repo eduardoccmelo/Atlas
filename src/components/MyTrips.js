@@ -61,6 +61,7 @@ export default function MyTrips() {
           <TripCard
             handleRemoveTrip={handleRemoveTrip}
             name={trip.name}
+            destinationCoordinates={trip.destinationCoordinates}
             id={trip.id}
             endDate={trip.end}
             transportation={trip.transportation}

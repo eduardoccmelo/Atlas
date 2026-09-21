@@ -4,6 +4,7 @@ import airports from "airports";
 import tzLookup from "tz-lookup";
 import SightSeeings from "./Sightseeings";
 import Expense from "./Expenses";
+import LocationAutocomplete from "./LocationAutocomplete";
 
 const airportByIata = new Map(
   airports
@@ -127,6 +128,7 @@ export default function Form({
   handleExpenseOnClick,
   inputDestinationName,
   setInputDestinationName,
+  setDestinationCoordinates,
   inputTripStart,
   setInputTripStart,
   inputTripEnd,
@@ -174,6 +176,8 @@ export default function Form({
   const [citySearch, setCitySearch] = useState("");
   const [cityOptions, setCityOptions] = useState([]);
   const [activeCityField, setActiveCityField] = useState("");
+  const [sightseeingCoordinates, setSightseeingCoordinates] = useState(null);
+  const [drivingMetrics, setDrivingMetrics] = useState({});
 
   useEffect(() => {
     document
@@ -220,6 +224,119 @@ export default function Form({
       clearTimeout(request);
     };
   }, [citySearch]);
+
+  const drivingRouteKey = transportLegs
+    .filter((leg) => leg.type === "car")
+    .map((leg) =>
+      [
+        leg.id,
+        leg.departureLocation,
+        leg.arrivalLocation,
+        ...(leg.departureLocationCoordinates || []),
+        ...(leg.arrivalLocationCoordinates || []),
+      ].join(","),
+    )
+    .join("|");
+
+  useEffect(() => {
+    const token = process.env.REACT_APP_MAPBOX_KEY;
+    const carLegs = transportLegs.filter((leg) => leg.type === "car");
+
+    if (!token || !carLegs.length) {
+      setDrivingMetrics({});
+      return undefined;
+    }
+
+    let cancelled = false;
+    const request = setTimeout(() => {
+      const resolvedCoordinates = (coordinates, label) => {
+        if (Array.isArray(coordinates) && coordinates.length === 2 && coordinates.every(Number.isFinite)) {
+          return Promise.resolve(coordinates);
+        }
+        if (!label?.trim()) return Promise.resolve(null);
+        return fetch(
+          `https://api.mapbox.com/search/geocode/v6/forward?q=${encodeURIComponent(label)}&types=address,street,place,locality&limit=1&access_token=${token}`,
+        )
+          .then((response) => (response.ok ? response.json() : { features: [] }))
+          .then((data) => data.features?.[0]?.geometry?.coordinates || null)
+          .catch(() => null);
+      };
+
+      Promise.all(
+        carLegs.map(async (leg) => {
+          const departure = await resolvedCoordinates(
+            leg.departureLocationCoordinates,
+            leg.departureLocation,
+          );
+          const arrival = await resolvedCoordinates(
+            leg.arrivalLocationCoordinates,
+            leg.arrivalLocation,
+          );
+          if (!departure || !arrival) return { id: leg.id, route: null };
+          const response = await fetch(
+            `https://api.mapbox.com/directions/v5/mapbox/driving/${departure[0]},${departure[1]};${arrival[0]},${arrival[1]}?overview=full&geometries=geojson&access_token=${token}`,
+          );
+          const data = response.ok ? await response.json() : {};
+          const route = data.routes?.[0];
+          return { id: leg.id, departure, arrival, route };
+        }),
+      )
+        .then((results) => {
+          if (cancelled) return;
+          setDrivingMetrics(
+            Object.fromEntries(
+              results
+                .filter((result) => result.route)
+                .map((result) => [
+                  result.id,
+                  { distance: result.route.distance, duration: result.route.duration },
+                ]),
+            ),
+          );
+          setTransportLegs((currentLegs) =>
+            currentLegs.map((leg) => {
+              const result = results.find((item) => item.id === leg.id);
+              if (!result?.route) return leg;
+              return {
+                ...leg,
+                departureLocationCoordinates: result.departure,
+                arrivalLocationCoordinates: result.arrival,
+              };
+            }),
+          );
+        })
+        .catch(() => !cancelled && setDrivingMetrics({}));
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(request);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [drivingRouteKey]); // Only reroute when a car's selected endpoints change.
+
+  function drivingDistance(leg) {
+    const distance = drivingMetrics[leg.id]?.distance;
+    if (Number.isFinite(distance)) return `${Math.round(distance / 1000).toLocaleString()} km`;
+    return leg.departureLocation && leg.arrivalLocation ? "Calculating route…" : "";
+  }
+
+  function drivingDuration(leg) {
+    const duration = drivingMetrics[leg.id]?.duration;
+    if (!Number.isFinite(duration)) {
+      return leg.departureLocation && leg.arrivalLocation ? "Calculating route…" : "";
+    }
+    const minutes = Math.round(duration / 60);
+    return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+  }
+
+  function drivingAverageSpeed(leg) {
+    const { distance, duration } = drivingMetrics[leg.id] || {};
+    if (Number.isFinite(distance) && Number.isFinite(duration) && duration > 0) {
+      return `${Math.round((distance / duration) * 3.6)} km/h`;
+    }
+    return leg.departureLocation && leg.arrivalLocation ? "Calculating route…" : "";
+  }
 
   function flightTimezone(leg) {
     const origin = airportFor(leg.departureLocation);
@@ -421,9 +538,11 @@ export default function Form({
     departureLocation: "",
     departureLocationCoordinates: null,
     departureAddress: "",
+    departureAddressCoordinates: null,
     arrivalLocation: "",
     arrivalLocationCoordinates: null,
     arrivalAddress: "",
+    arrivalAddressCoordinates: null,
     departureTime: "",
     departureDate: "",
     arrivalTime: "",
@@ -440,6 +559,7 @@ export default function Form({
     reservationNumber: "",
     type: "",
     address: "",
+    addressCoordinates: null,
     checkinDate: "",
     checkinTime: "",
     checkoutDate: "",
@@ -474,6 +594,22 @@ export default function Form({
 
   function renderLocationInput(leg, index, field) {
     const isAirport = leg.type === "plane";
+    if (!isAirport) {
+      const stationType = leg.type === "train" ? "train station " : "bus station ";
+      return (
+        <LocationAutocomplete
+          value={leg[field]}
+          placeholder={leg.type === "train" ? "Train station or city" : "Bus station or city"}
+          mode="poi"
+          types="poi,place,city,locality"
+          queryPrefix={stationType}
+          onChange={(value) => updateTransportLocation(index, field, value)}
+          onSelect={(coordinates, label) =>
+            updateTransportLocation(index, field, label, coordinates)
+          }
+        />
+      );
+    }
     const fieldId = `${leg.id}-${field}`;
     return (
       <div className={isAirport ? "" : "cityAutocomplete"}>
@@ -525,10 +661,26 @@ export default function Form({
   }
 
   function updateAccommodation(index, field, value) {
-    setAccommodations(
-      accommodations.map((stay, stayIndex) =>
+    setAccommodations((currentAccommodations) =>
+      currentAccommodations.map((stay, stayIndex) =>
         stayIndex === index ? { ...stay, [field]: value } : stay,
       ),
+    );
+  }
+
+  function renderAddressAutocomplete(value, onChange, onSelect, options = {}) {
+    return (
+      <LocationAutocomplete
+        value={value || ""}
+        placeholder={options.placeholder || "Street, number, city"}
+        mode={options.mode || "address"}
+        types={options.types}
+        onChange={(nextValue) => {
+          onChange(nextValue);
+          onSelect(nextValue, null);
+        }}
+        onSelect={(coordinates, label) => onSelect(label, coordinates)}
+      />
     );
   }
   function renderSightseeings() {
@@ -602,17 +754,23 @@ export default function Form({
         <p className="formSectionTitle">TRIP ESSENTIALS</p>
         <label className="tripNameForm" htmlFor="tripName">
           Destination Name
-          <input
-            onChange={(e) => {
-              setInputDestinationName(e.target.value);
+          <LocationAutocomplete
+            mode="poi"
+            types="country,region,place,city,locality"
+            selectionMode="name"
+            onChange={(value) => {
+              setInputDestinationName(value);
+              setDestinationCoordinates(null);
+            }}
+            onSelect={(coordinates, label, name) => {
+              setInputDestinationName(name || label);
+              setDestinationCoordinates(coordinates);
             }}
             value={inputDestinationName}
             id="tripName"
-            type="text"
-            placeholder="Type your destination"
-            maxLength="17"
+            placeholder="City, place or country"
             required
-          ></input>
+          />
         </label>
         <div className="formTravelDates">
           <label className="tripStartForm" htmlFor="tripStart">
@@ -648,7 +806,7 @@ export default function Form({
                   <div className="transportDetailTitle">
                     <span className="transportTypeIcon" aria-hidden="true">
                       <i
-                        className={`fas ${leg.type === "plane" ? "fa-plane" : leg.type === "bus" ? "fa-bus" : "fa-train"}`}
+                        className={`fas ${leg.type === "plane" ? "fa-plane" : leg.type === "bus" ? "fa-bus" : leg.type === "car" ? "fa-car" : "fa-train"}`}
                       ></i>
                     </span>
                     <strong>
@@ -668,7 +826,7 @@ export default function Form({
                   </button>
                 </div>
                 <div
-                  className={`detailFields transportFields ${leg.type === "plane" ? "isPlane" : leg.type === "bus" ? "isBus" : "isTrain"}`}
+                  className={`detailFields transportFields ${leg.type === "plane" ? "isPlane" : leg.type === "bus" ? "isBus" : leg.type === "train" ? "isTrain" : "isCar"}`}
                 >
                   <label>
                     TYPE
@@ -681,9 +839,50 @@ export default function Form({
                       <option value="plane">Plane</option>
                       <option value="bus">Bus</option>
                       <option value="train">Train</option>
+                      <option value="car">Car</option>
                     </select>
                   </label>
-                  <>
+                  {leg.type === "car" ? (
+                    <>
+                      <label className="carDepartureField">
+                        STARTING POINT
+                        <LocationAutocomplete
+                          value={leg.departureLocation}
+                          placeholder="Street address or city"
+                          mode="address"
+                          onChange={(value) => updateTransportLocation(index, "departureLocation", value)}
+                          onSelect={(coordinates, label) =>
+                            updateTransportLocation(index, "departureLocation", label, coordinates)
+                          }
+                        />
+                      </label>
+                      <label className="carArrivalField">
+                        DESTINATION
+                        <LocationAutocomplete
+                          value={leg.arrivalLocation}
+                          placeholder="Street address or city"
+                          mode="address"
+                          onChange={(value) => updateTransportLocation(index, "arrivalLocation", value)}
+                          onSelect={(coordinates, label) =>
+                            updateTransportLocation(index, "arrivalLocation", label, coordinates)
+                          }
+                        />
+                      </label>
+                      <label className="carMetricDistance">
+                        DRIVING DISTANCE
+                        <input readOnly value={drivingDistance(leg)} placeholder="Calculated from route" />
+                      </label>
+                      <label className="carMetricDuration">
+                        ESTIMATED DRIVE TIME
+                        <input readOnly value={drivingDuration(leg)} placeholder="Calculated from route" />
+                      </label>
+                      <label className="carMetricSpeed">
+                        AVERAGE SPEED
+                        <input readOnly value={drivingAverageSpeed(leg)} placeholder="Calculated from route" />
+                      </label>
+                    </>
+                  ) : (
+                    <>
                     <label>
                       {leg.type === "plane"
                         ? "AIRLINE"
@@ -756,35 +955,32 @@ export default function Form({
                       <>
                         <label>
                           DEPARTURE ADDRESS
-                          <input
-                            placeholder="Street and number"
-                            value={leg.departureAddress}
-                            onChange={(e) =>
+                          {renderAddressAutocomplete(
+                            leg.departureAddress,
+                            (value) => updateTransportLeg(index, "departureAddress", value),
+                            (value, coordinates) =>
                               updateTransportLeg(
                                 index,
-                                "departureAddress",
-                                e.target.value,
-                              )
-                            }
-                          />
+                                "departureAddressCoordinates",
+                                coordinates,
+                              ),
+                          )}
                         </label>
                         <label>
                           ARRIVAL ADDRESS
-                          <input
-                            placeholder="Street and number"
-                            value={leg.arrivalAddress}
-                            onChange={(e) =>
+                          {renderAddressAutocomplete(
+                            leg.arrivalAddress,
+                            (value) => updateTransportLeg(index, "arrivalAddress", value),
+                            (value, coordinates) =>
                               updateTransportLeg(
                                 index,
-                                "arrivalAddress",
-                                e.target.value,
-                              )
-                            }
-                          />
+                                "arrivalAddressCoordinates",
+                                coordinates,
+                              ),
+                          )}
                         </label>
                       </>
                     )}
-                  </>
                   {leg.type === "plane" && (
                     <label className="flightDateField">
                       DEPARTURE DATE
@@ -977,6 +1173,8 @@ export default function Form({
                       }
                     />
                   </label>
+                    </>
+                  )}
                 </div>
                 {leg.type === "plane" && (
                   <label className="connectionToggle">
@@ -1142,13 +1340,15 @@ export default function Form({
                 {carRental.differentDropoffAddress
                   ? "PICK-UP LOCATION"
                   : "PICK-UP AND DROP-OFF LOCATION"}
-                <input
-                  placeholder="Street, number, city"
-                  value={carRental.address}
-                  onChange={(e) =>
-                    setCarRental({ ...carRental, address: e.target.value })
-                  }
-                />
+                {renderAddressAutocomplete(
+                  carRental.address,
+                  (value) => setCarRental({ ...carRental, address: value }),
+                  (value, coordinates) =>
+                    setCarRental({
+                      ...carRental,
+                      addressCoordinates: coordinates,
+                    }),
+                )}
               </label>
               <label className="dropoffToggle">
                 <input
@@ -1166,16 +1366,16 @@ export default function Form({
               {carRental.differentDropoffAddress && (
                 <label className="detailFieldWide">
                   DROP-OFF LOCATION
-                  <input
-                    placeholder="Street, number, city"
-                    value={carRental.dropoffAddress || ""}
-                    onChange={(e) =>
+                  {renderAddressAutocomplete(
+                    carRental.dropoffAddress,
+                    (value) =>
+                      setCarRental({ ...carRental, dropoffAddress: value }),
+                    (value, coordinates) =>
                       setCarRental({
                         ...carRental,
-                        dropoffAddress: e.target.value,
-                      })
-                    }
-                  />
+                        dropoffAddressCoordinates: coordinates,
+                      }),
+                  )}
                 </label>
               )}
             </div>
@@ -1314,13 +1514,21 @@ export default function Form({
                   </label>
                   <label className="detailFieldWide">
                     ADDRESS
-                    <input
-                      placeholder="Street, number, city"
-                      value={stay.address}
-                      onChange={(e) =>
-                        updateAccommodation(index, "address", e.target.value)
-                      }
-                    />
+                    {renderAddressAutocomplete(
+                      stay.address,
+                      (value) => updateAccommodation(index, "address", value),
+                          (value, coordinates) =>
+                            updateAccommodation(
+                              index,
+                              "addressCoordinates",
+                              coordinates,
+                            ),
+                          {
+                            mode: "poi",
+                            types: "address,street,place,city,locality,poi",
+                            placeholder: "Address, hotel, hostel or resort",
+                          },
+                        )}
                   </label>
                 </div>
               </div>
@@ -1341,20 +1549,23 @@ export default function Form({
         <p className="formSectionTitle">SIGHTSEEINGS</p>
         <div className="sightSeeingHeader">
           <label>
-            <input
-              type="text"
+            <LocationAutocomplete
+              mode="poi"
+              types="poi"
               value={inputSightseeing}
-              onChange={(e) => {
-                e.preventDefault();
-                setInputSightseeing(e.target.value);
-              }}
-              id="tripSightseeings"
               placeholder="New Sightseeing"
-              maxLength="14"
-            ></input>
+              onChange={(value) => {
+                setInputSightseeing(value);
+                setSightseeingCoordinates(null);
+              }}
+              onSelect={(coordinates) => setSightseeingCoordinates(coordinates)}
+            />
             <button
               className="addSightseeingButton"
-              onClick={handleSightseeingOnClick}
+              onClick={(event) => {
+                handleSightseeingOnClick(event, sightseeingCoordinates);
+                setSightseeingCoordinates(null);
+              }}
             >
               Add
             </button>

@@ -5,13 +5,18 @@ import genericDestinationImage from "../images/earth.png";
 
 const destinationImageCache = new Map();
 
-async function fetchCountryFlag(destination) {
+async function fetchCountryFlag(destination, coordinates) {
+  const hasCoordinates =
+    Array.isArray(coordinates) && coordinates.length === 2 && coordinates.every(Number.isFinite);
   const locationResponse = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q=${encodeURIComponent(destination)}`
+    hasCoordinates
+      ? `https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=${coordinates[1]}&lon=${coordinates[0]}`
+      : `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q=${encodeURIComponent(destination)}`
   );
   if (!locationResponse.ok) return "";
 
-  const location = (await locationResponse.json())[0];
+  const payload = await locationResponse.json();
+  const location = hasCoordinates ? payload : payload[0];
   const countryCode = location?.address?.country_code?.toLowerCase();
   if (!countryCode) return "";
 
@@ -21,6 +26,7 @@ async function fetchCountryFlag(destination) {
 export default function TripCard({
   handleRemoveTrip,
   name,
+  destinationCoordinates,
   id,
   transportation,
   startDay,
@@ -39,7 +45,9 @@ export default function TripCard({
       setDestinationImage(genericDestinationImage);
       return undefined;
     }
-    const cacheKey = destination.toLowerCase();
+    const cacheKey = destinationCoordinates
+      ? destinationCoordinates.join(",")
+      : destination.toLowerCase();
     if (destinationImageCache.has(cacheKey)) {
       setDestinationImage(destinationImageCache.get(cacheKey));
       return undefined;
@@ -47,7 +55,7 @@ export default function TripCard({
 
     let cancelled = false;
     setDestinationImage(genericDestinationImage);
-    fetchCountryFlag(destination)
+    fetchCountryFlag(destination, destinationCoordinates)
       .then((image) => {
         if (image) destinationImageCache.set(cacheKey, image);
         if (!cancelled) setDestinationImage(image || genericDestinationImage);
@@ -57,7 +65,7 @@ export default function TripCard({
     return () => {
       cancelled = true;
     };
-  }, [name]);
+  }, [name, destinationCoordinates]);
 
   function classTripDate() {
     const today = new Date();

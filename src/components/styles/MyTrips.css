@@ -86,16 +86,17 @@
 .pastTripItem::before {
   content: "";
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 65.5%;
-  border-radius: 8px 0 0 8px;
+  top: 8px;
+  bottom: 8px;
+  left: 8px;
+  width: 66px;
+  border-radius: 10px 0 0 10px;
   background-image:
-    linear-gradient(rgba(216, 241, 241, 0.72), rgba(216, 241, 241, 0.72)),
+    linear-gradient(rgba(216, 241, 241, 0.38), rgba(216, 241, 241, 0.38)),
     var(--destination-image);
   background-position: center;
   background-size: cover;
+  border-left: 1px solid rgba(255, 255, 255, 0.62);
   pointer-events: none;
   z-index: 0;
 }
@@ -120,13 +121,16 @@
 .tripCardInfo {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   min-width: 0;
+  text-align: center;
 }
 .tripCardContent {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 0;
+  left: 84px;
   right: 34.5%;
   display: flex;
   align-items: center;
@@ -134,39 +138,18 @@
 }
 .tripCardContent .tripName {
   margin-right: 0;
-  -webkit-text-stroke: 3.5px rgba(255, 255, 255, 1);
-  paint-order: stroke fill;
-  text-shadow:
-    -2px -2px 0 rgba(255, 255, 255, 1),
-    2px -2px 0 rgba(255, 255, 255, 1),
-    -2px 2px 0 rgba(255, 255, 255, 1),
-    2px 2px 0 rgba(255, 255, 255, 1);
+  display: block;
+  text-align: center;
+  white-space: normal;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+.tripNameLine {
+  display: block;
+  line-height: 1.08;
 }
 .tripCardInfo i {
   margin-right: -5px;
-}
-
-.tripStart,
-.tripEnd {
-  display: grid;
-  grid-template-columns: 2ch auto 2ch;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  color: #123847;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-.tripStart .tripDateMonth,
-.tripEnd .tripDateMonth {
-  padding: 1px 4px;
-  border-radius: 4px;
-  color: #fff;
-  background: var(--teal);
-  font-size: 0.65em;
-  font-weight: 850;
-  line-height: 1.35;
-  text-transform: uppercase;
 }
 
 .cardDivider {
@@ -179,7 +162,7 @@
   font-family: inherit;
   text-transform: uppercase;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 850;
   letter-spacing: 0.05em;
   color: black;
@@ -187,34 +170,44 @@
 }
 .tripDates {
   position: absolute;
-  right: 29.5px;
-  top: 4px;
-  font-size: 14px;
-  line-height: 1.6;
-  color: inherit;
-  font-weight: inherit;
-  letter-spacing: inherit;
-  text-align: inherit;
-  text-transform: none;
+  top: 11px;
+  right: 36px;
+  left: calc(65.5% + 12px);
+  justify-content: center;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 5px;
+  color: #123847;
+  font-size: 0.8rem;
+  font-weight: 850;
+  letter-spacing: 0.01em;
+  display: flex;
 }
-.tripDates::before {
-  display: none;
+.tripDates i {
+  color: var(--teal);
+  font-size: 0.65rem;
+}
+.tripDateEnd {
+  white-space: nowrap;
 }
 .tripCardActions {
   position: absolute;
-  right: 26px;
-  top: 54px;
+  top: 40px;
+  right: 36px;
+  bottom: 7px;
+  left: calc(65.5% + 12px);
   display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 .tripViewButton,
 .tripEditButton {
-  height: 35px;
-  width: 50px;
-  font-size: 0.68rem;
+  flex: 1;
+  min-height: 23px;
+  height: auto;
+  width: 100%;
+  padding: 0 4px;
+  font-size: 0.62rem;
   font-weight: 850;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -314,12 +307,14 @@
   }
   .myTripsItem::before,
   .pastTripItem::before {
-    width: 60%;
+    left: 8px;
+    width: 56px;
   }
   .cardDivider {
     left: 60%;
   }
   .tripCardContent {
+    left: 74px;
     right: 40%;
   }
   .tripName {
@@ -343,19 +338,25 @@
     font-size: 1rem;
   }
   .tripDates {
-    right: 27px;
+    top: 11px;
+    right: 19px;
+    left: calc(60% + 12px);
+    justify-content: center;
     font-size: 16px;
     line-height: 1.25;
   }
   .tripCardActions {
-    right: 25px;
-    top: 55px;
+    top: 40px;
+    right: 19px;
+    bottom: 7px;
+    left: calc(60% + 12px);
+    flex-direction: column;
     gap: 4px;
   }
   .tripViewButton,
   .tripEditButton {
-    width: 46px;
-    height: 34px;
+    width: 100%;
+    height: auto;
     font-size: 0.64rem;
   }
 }
@@ -366,26 +367,28 @@
     width: 420px;
   }
   .tripName {
-    font-size: 20px;
+    font-size: 21px;
   }
   .tripDates {
-    right: 33px;
-    top: 6px;
-    font-size: 20px;
-    line-height: 1.1;
+    right: 36px;
+    left: calc(65.5% + 12px);
+    top: 11px;
+    font-size: 0.9rem;
   }
   .tripCardActions {
-    right: 30px;
-    top: 55px;
+    right: 36px;
+    left: calc(65.5% + 12px);
+    top: 36px;
+    bottom: 7px;
   }
   .tripCardContent {
-    left: 0;
+    left: 84px;
     right: 34.5%;
   }
   .tripViewButton,
   .tripEditButton {
-    width: 50px;
-    font-size: 0.7rem;
+    width: 100%;
+    font-size: 0.62rem;
   }
 }
 
@@ -397,33 +400,5 @@
     padding: 0 3px;
     font-size: clamp(13px, 4.35vw, 16px);
     text-align: center;
-  }
-}
-
-@media (max-width: 349px) {
-  .tripStart .tripDateMonth,
-  .tripEnd .tripDateMonth {
-    font-size: 0;
-  }
-  .tripStart .tripDateMonth::after,
-  .tripEnd .tripDateMonth::after {
-    content: attr(data-month-number);
-    font-size: 0.65rem;
-  }
-}
-
-@media (max-width: 349px) {
-  .tripCardActions {
-    top: 46px;
-    right: 40px;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .tripViewButton,
-  .tripEditButton {
-    width: 48px;
-    height: 22px;
-    font-size: 0.58rem;
-    border-radius: 7px;
   }
 }

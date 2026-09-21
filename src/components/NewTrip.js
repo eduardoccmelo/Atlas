@@ -6,6 +6,7 @@ import "./styles/Form.css";
 
 export default function NewTrip() {
   const [inputDestinationName, setInputDestinationName] = useState("");
+  const [destinationCoordinates, setDestinationCoordinates] = useState(null);
   const [inputTripStart, setInputTripStart] = useState("");
   const [inputTripEnd, setInputTripEnd] = useState("");
   const [inputTransportType, setInputTransportType] = useState("");
@@ -55,6 +56,7 @@ export default function NewTrip() {
         1
       )}${inputTripStart}${inputTripEnd}${inputDestinationName.slice(1, 2)}`,
       name: inputDestinationName,
+      destinationCoordinates,
       start: inputTripStart,
       end: inputTripEnd,
       transportation: mainLeg.type || inputTransportType,
@@ -75,12 +77,12 @@ export default function NewTrip() {
     history.push("/myTrips");
   }
 
-  function handleSightseeingOnClick(e) {
+  function handleSightseeingOnClick(e, coordinates = null) {
     e.preventDefault();
     if (inputSightseeing !== "") {
       setAllSightseeings([
         ...allSightseeings,
-        { sightseeing: inputSightseeing },
+        { sightseeing: inputSightseeing, coordinates },
       ]);
     }
     setInputSightseeing("");
@@ -112,6 +114,7 @@ export default function NewTrip() {
         handleExpenseOnClick={handleExpenseOnClick}
         inputDestinationName={inputDestinationName}
         setInputDestinationName={setInputDestinationName}
+        setDestinationCoordinates={setDestinationCoordinates}
         inputTripStart={inputTripStart}
         setInputTripStart={setInputTripStart}
         inputTripEnd={inputTripEnd}

@@ -2,203 +2,365 @@ import "./styles/Trip.css";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { getSingleTripFromLocalStorage } from "../services/myTripsStorage";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import TripLocationsMap from "./TripLocationsMap";
+
+function formatDate(date) {
+  if (!date) return "Not added";
+  return new Date(date + "T12:00:00").toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function Section({ icon, title, count, children, className = "" }) {
+  return (
+    <section className={"tripDetailSection " + className}>
+      <div className="tripDetailSectionHeader">
+        <span className="tripDetailSectionIcon" aria-hidden="true">
+          <i className={"fas " + icon}></i>
+        </span>
+        <div>
+          <p className="tripDetailSectionEyebrow">TRIP PLAN</p>
+          <h3>{title}</h3>
+        </div>
+        {typeof count === "number" && (
+          <span className="tripDetailSectionCount">{count}</span>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function InfoItem({ label, children, empty = false }) {
+  return (
+    <div className={"tripInfoItem" + (empty ? " isEmpty" : "")}>
+      <span>{label}</span>
+      <strong>{children}</strong>
+    </div>
+  );
+}
+
+function TransportEntry({ leg, index }) {
+  const type = leg.type || "transport";
+  const icon =
+    type === "plane"
+      ? "fa-plane"
+      : type === "bus"
+        ? "fa-bus"
+        : type === "car"
+          ? "fa-car"
+          : "fa-train";
+  const routeIsComplete = leg.departureLocation && leg.arrivalLocation;
+
+  return (
+    <article className="tripEntryCard">
+      <div className="tripEntryHeading">
+        <span className="tripEntryIcon" aria-hidden="true">
+          <i className={"fas " + icon}></i>
+        </span>
+        <div>
+          <p>{index === 0 ? "MAIN JOURNEY" : "CONNECTION " + index}</p>
+          <h4>{type}</h4>
+        </div>
+      </div>
+      <div className={"tripRoute" + (routeIsComplete ? "" : " isEmpty")}>
+        <span>{leg.departureLocation || "Departure place not added"}</span>
+        <i className="fas fa-long-arrow-alt-right" aria-hidden="true"></i>
+        <span>{leg.arrivalLocation || "Arrival place not added"}</span>
+      </div>
+      <div className="tripInfoGrid">
+        <InfoItem label="DATE" empty={!leg.departureDate}>
+          {formatDate(leg.departureDate)}
+        </InfoItem>
+        <InfoItem label="TIME" empty={!leg.departureTime && !leg.arrivalTime}>
+          {(leg.departureTime || "Not added") + " → " + (leg.arrivalTime || "Not added")}
+        </InfoItem>
+        {type !== "car" && (
+          <>
+            <InfoItem
+              label={type === "plane" ? "FLIGHT" : type === "train" ? "TICKET / TRAIN" : "RESERVATION"}
+              empty={!leg.vehicleNumber && !leg.bookingReference}
+            >
+              {leg.vehicleNumber || leg.bookingReference || "Not added"}
+            </InfoItem>
+            <InfoItem label="SEAT(S)" empty={!leg.seat}>
+              {leg.seat || "Not added"}
+            </InfoItem>
+          </>
+        )}
+      </div>
+      {(leg.company || leg.bookingReference) && (
+        <p className="tripEntryFootnote">
+          {[leg.company, leg.bookingReference && "Booking " + leg.bookingReference]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      )}
+    </article>
+  );
+}
+
+function AccommodationEntry({ stay, index }) {
+  const isOtherAccommodation = stay.type === "Other";
+  return (
+    <article className="tripEntryCard">
+      <div className="tripEntryHeading">
+        <span className="tripEntryIcon" aria-hidden="true">
+          <i className="fas fa-bed"></i>
+        </span>
+        <div>
+          <p>{"STAY " + (index + 1)}</p>
+          <h4>{stay.name || "Accommodation not added"}</h4>
+        </div>
+      </div>
+      <div className="tripInfoGrid">
+        <InfoItem label="TYPE" empty={!stay.type}>
+          {stay.type || "Not added"}
+        </InfoItem>
+        {(!isOtherAccommodation || stay.provider) && (
+          <InfoItem label="PROVIDER" empty={!stay.provider}>
+            {stay.provider || "Not added"}
+          </InfoItem>
+        )}
+        {(!isOtherAccommodation || stay.checkinDate || stay.checkinTime) && (
+          <InfoItem label="CHECK-IN" empty={!stay.checkinDate && !stay.checkinTime}>
+            {stay.checkinDate
+              ? formatDate(stay.checkinDate) + " · " + (stay.checkinTime || "Not added")
+              : stay.checkinTime}
+          </InfoItem>
+        )}
+        {(!isOtherAccommodation || stay.checkoutDate || stay.checkoutTime) && (
+          <InfoItem label="CHECK-OUT" empty={!stay.checkoutDate && !stay.checkoutTime}>
+            {stay.checkoutDate
+              ? formatDate(stay.checkoutDate) + " · " + (stay.checkoutTime || "Not added")
+              : stay.checkoutTime}
+          </InfoItem>
+        )}
+      </div>
+      {(stay.address || stay.reservationNumber) && (
+        <p className="tripEntryFootnote">
+          {[stay.reservationNumber && "Booking " + stay.reservationNumber, stay.address]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      )}
+    </article>
+  );
+}
 
 export default function Trip() {
   const history = useHistory();
   const [singleTrip, setSingleTrip] = useState();
+  const [countryFlag, setCountryFlag] = useState("");
   const { id } = useParams();
 
-  const container = {
-    hidden: { opacity: 0, scale: 0 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.1,
-      },
-    },
-  };
-
   useEffect(() => {
-    const myTrip = getSingleTripFromLocalStorage(id);
-    setSingleTrip(myTrip);
+    setSingleTrip(getSingleTripFromLocalStorage(id));
   }, [id]);
 
-  function sumFunction() {
-    const sum = singleTrip.expenses.reduce(function (prev, cur) {
-      return prev + cur.value;
-    }, 0);
-    return `${singleTrip.expenses[0].currency}${sum}`;
-  }
-
-  function formatDate(date) {
-    if (!date) return "Not added yet";
-    return `${date.slice(8, 10)}.${new Date(date).toLocaleString("default", {
-      month: "short",
-    })}`;
-  }
-
-  function DetailField({ label, children, isEmpty = false }) {
-    return (
-      <div className={`tripDetailItem${isEmpty ? " isEmpty" : ""}`}>
-        <div className="tripDetailsFieldTitle">{label}</div>
-        <div className="tripDetailsFieldContent">{children}</div>
-      </div>
-    );
-  }
-
-  function transportSummary(leg) {
-    return [
-      leg.company,
-      leg.vehicleNumber,
-      leg.departureLocation && "From " + leg.departureLocation,
-      leg.arrivalLocation && "to " + leg.arrivalLocation,
-      leg.bookingReference && "Booking " + leg.bookingReference,
-      leg.seat && "Seat " + leg.seat,
-      leg.paidAmount && (leg.currency || "€") + leg.paidAmount,
-    ]
-      .filter(Boolean)
-      .join(" · ");
-  }
-
-  function staySummary(stay) {
-    return [
-      stay.type,
-      stay.provider,
-      stay.reservationNumber && "Booking " + stay.reservationNumber,
-      stay.address,
-      stay.paidAmount && (stay.currency || "€") + stay.paidAmount,
-    ]
-      .filter(Boolean)
-      .join(" · ");
-  }
-
-  function notesSummary(notes) {
-    if (Array.isArray(notes)) {
-      return notes.map((note) => note.message).filter(Boolean).join(" · ");
+  useEffect(() => {
+    const destination = singleTrip?.name?.trim();
+    const coordinates = singleTrip?.destinationCoordinates;
+    if (!destination) {
+      setCountryFlag("");
+      return undefined;
     }
-    return notes || "";
-  }
 
-  return singleTrip ? (
+    let cancelled = false;
+    fetch(
+      Array.isArray(coordinates) && coordinates.length === 2
+        ? "https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&lat=" +
+          coordinates[1] +
+          "&lon=" +
+          coordinates[0]
+        : "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q=" +
+          encodeURIComponent(destination),
+    )
+      .then((response) => (response.ok ? response.json() : []))
+      .then((results) => {
+        const location = Array.isArray(results) ? results[0] : results;
+        const countryCode = location?.address?.country_code?.toLowerCase();
+        if (!cancelled) {
+          setCountryFlag(
+            countryCode ? "https://flagcdn.com/w80/" + countryCode + ".png" : "",
+          );
+        }
+      })
+      .catch(() => !cancelled && setCountryFlag(""));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [singleTrip?.name, singleTrip?.destinationCoordinates]);
+
+  if (!singleTrip) return "";
+
+  const transportLegs = Array.isArray(singleTrip.transportLegs)
+    ? singleTrip.transportLegs
+    : [];
+  const accommodations = Array.isArray(singleTrip.accommodations)
+    ? singleTrip.accommodations
+    : [];
+  const sightseeings = Array.isArray(singleTrip.sightseeings)
+    ? singleTrip.sightseeings
+    : [];
+  const expenses = Array.isArray(singleTrip.expenses) ? singleTrip.expenses : [];
+  const notes = Array.isArray(singleTrip.notes)
+    ? singleTrip.notes.map((note) => note.message).filter(Boolean)
+    : singleTrip.notes
+      ? [singleTrip.notes]
+      : [];
+  const expenseTotals = expenses.reduce((totals, expense) => {
+    const currency = expense.currency || "€";
+    totals[currency] = (totals[currency] || 0) + Number(expense.value || 0);
+    return totals;
+  }, {});
+
+  return (
     <div className="TripDetails">
       <div className="tripDetailsHeader">
         <h2>TRIP DETAILS</h2>
       </div>
-      <div className="tripDetailsTitle">{singleTrip.name}</div>
+      <div className="tripDetailsTitle">
+        <span>{String(singleTrip.name || "").split(" — ")[0]}</span>
+        {countryFlag && (
+          <img src={countryFlag} alt={"Flag of " + singleTrip.name} />
+        )}
+      </div>
+
       <motion.div
-        variants={container}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
         className="tripDetailsContent"
       >
-        <DetailField label="START / END">
-          <i className="far fa-calendar-check"></i>
-          {formatDate(singleTrip.start)} / {formatDate(singleTrip.end)}
-        </DetailField>
-        {(!singleTrip.transportLegs || singleTrip.transportLegs.length === 0) && (
-          <DetailField
-            label="TRANSPORT"
-            isEmpty={!singleTrip.transportation || singleTrip.transportation === "none"}
-          >
-            {singleTrip.transportation && singleTrip.transportation !== "none"
-              ? singleTrip.transportation
-              : "Not added yet"}
-          </DetailField>
-        )}
-        {singleTrip.transportLegs &&
-          singleTrip.transportLegs.map((leg, index) => (
-            <DetailField
-              key={leg.id || index}
-              label={(leg.type || "TRANSPORT") + " " + (index + 1)}
-              isEmpty={!transportSummary(leg)}
-            >
-              {transportSummary(leg) || "Not added yet"}
-            </DetailField>
-          ))}
-        <DetailField label="DEPARTURE" isEmpty={!singleTrip.departure}>
-          <i className="far fa-clock"></i>
-          {singleTrip.departure || "Not added yet"}
-        </DetailField>
-        <DetailField label="ARRIVAL" isEmpty={!singleTrip.arrival}>
-          <i className="far fa-clock"></i>
-          {singleTrip.arrival || "Not added yet"}
-        </DetailField>
-        {(!singleTrip.accommodations || singleTrip.accommodations.length === 0) && (
-          <DetailField label="ACCOMMODATION" isEmpty={!singleTrip.accommodation}>
-            {singleTrip.accommodation || "Not added yet"}
-          </DetailField>
-        )}
-        {singleTrip.accommodations &&
-          singleTrip.accommodations.map((stay, index) => (
-            <DetailField
-              key={stay.id || index}
-              label={"STAY " + (index + 1)}
-              isEmpty={!staySummary(stay)}
-            >
-              {staySummary(stay) || "Not added yet"}
-            </DetailField>
-          ))}
-        {singleTrip.carRental && singleTrip.carRental.enabled && (
-          <DetailField label="CAR RENTAL">
-            {[
-              singleTrip.carRental.company,
-              singleTrip.carRental.carType,
-              singleTrip.carRental.reservationNumber &&
-                "Booking " + singleTrip.carRental.reservationNumber,
-              singleTrip.carRental.paidAmount &&
-                (singleTrip.carRental.currency || "€") +
-                  singleTrip.carRental.paidAmount,
-            ]
-              .filter(Boolean)
-              .join(" · ") || "Not added yet"}
-          </DetailField>
-        )}
-        <DetailField label="CHECK-IN" isEmpty={!singleTrip.checkinDate}>
-          <i className="far fa-calendar-alt"></i>
-          {formatDate(singleTrip.checkinDate)}
-          {singleTrip.checkinTime && ` · ${singleTrip.checkinTime}`}
-        </DetailField>
-        <DetailField label="CHECK-OUT" isEmpty={!singleTrip.checkoutDate}>
-          <i className="far fa-calendar-alt"></i>
-          {formatDate(singleTrip.checkoutDate)}
-          {singleTrip.checkoutTime && ` · ${singleTrip.checkoutTime}`}
-        </DetailField>
-        <DetailField
-          label="SIGHTSEEINGS"
-          isEmpty={!singleTrip.sightseeings || singleTrip.sightseeings.length === 0}
-        >
-          {singleTrip.sightseeings && singleTrip.sightseeings.length
-            ? singleTrip.sightseeings.map((item) => item.sightseeing).join(", ")
-            : "Not added yet"}
-        </DetailField>
-        <DetailField
-          label="EXPENSES"
-          isEmpty={!singleTrip.expenses || singleTrip.expenses.length === 0}
-        >
-          {singleTrip.expenses && singleTrip.expenses.length
-            ? sumFunction()
-            : "Not added yet"}
-        </DetailField>
-        <DetailField label="NOTES" isEmpty={!notesSummary(singleTrip.notes)}>
-          {notesSummary(singleTrip.notes) || "Not added yet"}
-        </DetailField>
+        <section className="tripOverviewCard">
+          <div className="tripOverviewDate">
+            <span>START</span>
+            <strong>{formatDate(singleTrip.start)}</strong>
+          </div>
+          <i className="fas fa-arrow-right" aria-hidden="true"></i>
+          <div className="tripOverviewDate">
+            <span>END</span>
+            <strong>{formatDate(singleTrip.end)}</strong>
+          </div>
+        </section>
+
+        <Section icon="fa-route" title="Transport" count={transportLegs.length}>
+          {transportLegs.length ? (
+            <div className="tripEntryCollection">
+              {transportLegs.map((leg, index) => (
+                <TransportEntry key={leg.id || index} leg={leg} index={index} />
+              ))}
+            </div>
+          ) : (
+            <p className="tripEmptyState">No transport has been added yet.</p>
+          )}
+          {singleTrip.carRental?.enabled && (
+            <article className="tripEntryCard tripRentalCard">
+              <div className="tripEntryHeading">
+                <span className="tripEntryIcon" aria-hidden="true">
+                  <i className="fas fa-car"></i>
+                </span>
+                <div>
+                  <p>OPTIONAL ADD-ON</p>
+                  <h4>Car rental</h4>
+                </div>
+              </div>
+              <div className="tripInfoGrid">
+                <InfoItem label="COMPANY" empty={!singleTrip.carRental.company}>
+                  {singleTrip.carRental.company || "Not added"}
+                </InfoItem>
+                <InfoItem label="CAR" empty={!singleTrip.carRental.carType}>
+                  {singleTrip.carRental.carType || "Not added"}
+                </InfoItem>
+                <InfoItem label="PICK-UP" empty={!singleTrip.carRental.pickupDate}>
+                  {formatDate(singleTrip.carRental.pickupDate)}
+                </InfoItem>
+                <InfoItem label="DROP-OFF" empty={!singleTrip.carRental.dropoffDate}>
+                  {formatDate(singleTrip.carRental.dropoffDate)}
+                </InfoItem>
+              </div>
+              {singleTrip.carRental.address && (
+                <p className="tripEntryFootnote">{singleTrip.carRental.address}</p>
+              )}
+            </article>
+          )}
+        </Section>
+
+        <Section icon="fa-bed" title="Accommodation" count={accommodations.length}>
+          {accommodations.length ? (
+            <div className="tripEntryCollection">
+              {accommodations.map((stay, index) => (
+                <AccommodationEntry key={stay.id || index} stay={stay} index={index} />
+              ))}
+            </div>
+          ) : (
+            <p className="tripEmptyState">No accommodation has been added yet.</p>
+          )}
+        </Section>
+
+        <TripLocationsMap trip={singleTrip} />
+
+        <Section icon="fa-map-pin" title="Plan & expenses">
+          <div className="tripPlanningGrid">
+            <div className="tripPlanningCard">
+              <p>SIGHTSEEINGS</p>
+              {sightseeings.length ? (
+                <ul>
+                  {sightseeings.map((item, index) => (
+                    <li key={item.sightseeing + "-" + index}>{item.sightseeing}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span className="tripEmptyText">Not added yet</span>
+              )}
+            </div>
+            <div className="tripPlanningCard">
+              <p>EXPENSES</p>
+              {expenses.length ? (
+                <div className="tripExpenseList">
+                  {expenses.map((expense, index) => (
+                    <span key={expense.name + "-" + index}>
+                      {expense.name}
+                      <strong>{(expense.currency || "€") + expense.value}</strong>
+                    </span>
+                  ))}
+                  <b>
+                    {"Total: " + Object.entries(expenseTotals)
+                      .map(([currency, value]) => currency + value)
+                      .join(" · ")}
+                  </b>
+                </div>
+              ) : (
+                <span className="tripEmptyText">Not added yet</span>
+              )}
+            </div>
+          </div>
+        </Section>
+
+        <Section icon="fa-sticky-note" title="Notes">
+          <div className={"tripNotes" + (notes.length ? "" : " isEmpty")}>
+            {notes.length ? notes.join(" ") : "No notes have been added yet."}
+          </div>
+        </Section>
       </motion.div>
+
       <div className="tripDetailsFooter">
-        <Link className="editLink" to={`/myTrips/${singleTrip.id}/edit`}>
-          <button className="editTripButton">Edit</button>
+        <Link className="editLink" to={"/myTrips/" + singleTrip.id + "/edit"}>
+          <button className="editTripButton">Edit trip</button>
         </Link>
         <button
           className="editTripCancelButton"
           onClick={() => history.push("/myTrips")}
         >
-          Back
+          Back to trips
         </button>
       </div>
     </div>
-  ) : (
-    ""
   );
 }

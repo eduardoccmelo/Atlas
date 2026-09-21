@@ -11,6 +11,8 @@
 }
 .formHeader, .formTransport, .formAccommodation, .formSightseeings, .formExpenses, .formNotes { grid-column: 1 / -1; }
 .formHeader { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.formHeader:focus-within { position: relative; z-index: 30; }
+.formSightseeings:focus-within { position: relative; z-index: 30; }
 .formHeader .formTravelDates { display: contents; }
 .formHeader .tripNameForm { width: auto; }
 .checkinCheckout, .departureArrival { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -19,14 +21,44 @@
 .formAccommodation, .formSightseeings, .formExpenses, .formNotes { gap: 10px; padding: 16px 22px; }
 .formSightseeings, .formExpenses { display: grid; }
 .formSightseeings > .addDetailButton, .formExpenses > .addDetailButton { margin-top: 4px; }
-.formSectionTitle { grid-column: 1 / -1; margin: 0; color: var(--ocean); font-size: .68rem; font-weight: 850; letter-spacing: .12em; }
+.formSectionTitle {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  color: var(--ocean);
+  font-size: .72rem;
+  font-weight: 850;
+  letter-spacing: .1em;
+}
+.formSectionTitle::before {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--paper);
+  background: var(--teal);
+  box-shadow: 0 3px 8px rgba(12, 133, 128, .2);
+  font-family: "Font Awesome 5 Free";
+  font-size: .76rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+.formHeader .formSectionTitle::before { content: "\f3c5"; }
+.formTransport .formSectionTitle::before { content: "\f4d7"; }
+.formAccommodation .formSectionTitle::before { content: "\f236"; }
+.formSightseeings .formSectionTitle::before { content: "\f5a0"; }
+.formExpenses .formSectionTitle::before { content: "\f555"; }
+.formNotes .formSectionTitle::before { content: "\f249"; }
 .detailCollection { grid-column: 1 / -1; display: grid; gap: 12px; width: 100%; }
 .detailCard { padding: 15px; border: 1px solid #d5e5ea; border-radius: 12px; background: rgba(255, 255, 255, .58); }
 .detailCardHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--ocean); font-size: .72rem; letter-spacing: .08em; }
 .transportDetailTitle { display: flex; align-items: center; gap: 8px; }
 .transportTypeIcon { display: inline-grid; width: 28px; height: 28px; place-items: center; border-radius: 9px; color: var(--paper); background: var(--teal); font-size: .85rem; box-shadow: 0 3px 8px rgba(12, 133, 128, .2); }
 .transportTypeIcon .fa-plane { margin-top: 2px; margin-left: 3px; }
-.transportTypeIcon .fa-bus, .transportTypeIcon .fa-train { margin-top: 1px; margin-left: 1px; }
+.transportTypeIcon .fa-bus, .transportTypeIcon .fa-train, .transportTypeIcon .fa-car { margin-top: 1px; margin-left: 1px; }
 .detailFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .rentalFields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .rentalFields .pickupAddressField { grid-column: span 2; }
@@ -70,14 +102,20 @@
 .transportFields.isTrain > label:nth-of-type(4) { grid-column: 1 / span 4; grid-row: 4; }
 .transportFields.isTrain > label:nth-of-type(5) { grid-column: 5 / span 4; grid-row: 4; }
 .transportFields.isTrain .trainMetricDistance { grid-column: 9 / span 4; grid-row: 4; }
-.flightMetricDistance input, .flightMetricDuration input, .busMetricDistance input, .busMetricDuration input, .trainMetricDistance input, .trainMetricDuration input { color: #829ab1; background: rgba(222, 235, 240, .8); cursor: not-allowed; }
+.transportFields.isCar > label:nth-of-type(1) { grid-column: 1 / span 4; grid-row: 1; }
+.transportFields.isCar .carDepartureField { grid-column: 5 / span 4; grid-row: 1; }
+.transportFields.isCar .carArrivalField { grid-column: 9 / span 4; grid-row: 1; }
+.transportFields.isCar .carMetricDistance { grid-column: 1 / span 4; grid-row: 2; }
+.transportFields.isCar .carMetricDuration { grid-column: 5 / span 4; grid-row: 2; }
+.transportFields.isCar .carMetricSpeed { grid-column: 9 / span 4; grid-row: 2; }
+.flightMetricDistance input, .flightMetricDuration input, .busMetricDistance input, .busMetricDuration input, .trainMetricDistance input, .trainMetricDuration input, .carMetricDistance input, .carMetricDuration input, .carMetricSpeed input { color: #829ab1; background: rgba(222, 235, 240, .8); cursor: not-allowed; }
 .flightTimeError { margin: 0; padding: 10px 12px; border: 1px solid rgba(179, 58, 50, .35); border-radius: 8px; color: #9f2f2a; background: rgba(255, 235, 232, .9); font-size: .82rem; font-weight: 700; }
 .transportFields.isPlane > label:nth-of-type(7), .transportFields.isPlane > label:nth-of-type(8) { display: none; }
 .detailFields label { display: flex; flex-direction: column; gap: 5px; color: #486581; font-size: .66rem; font-weight: 850; letter-spacing: .06em; }
-.cityAutocomplete { position: relative; width: 100%; }
-.citySuggestions { position: absolute; z-index: 12; top: calc(100% + 4px); right: 0; left: 0; max-height: 180px; overflow-y: auto; border: 1px solid #cbdde8; border-radius: 8px; background: #fff; box-shadow: 0 10px 22px rgba(20, 56, 78, .2); }
-.citySuggestions button { display: block; width: 100%; padding: 9px 10px; border: 0; border-bottom: 1px solid #edf3f5; color: #334e68; background: #fff; cursor: pointer; font: inherit; font-size: .78rem; text-align: left; }
-.citySuggestions button:hover { background: #eaf5f5; color: var(--ocean); }
+.cityAutocomplete, .locationAutocomplete { position: relative; width: 100%; }
+.citySuggestions, .locationSuggestions { position: absolute; z-index: 50; top: calc(100% + 4px); right: 0; left: 0; max-height: 180px; overflow-y: auto; border: 1px solid #cbdde8; border-radius: 8px; background: #fff; box-shadow: 0 10px 22px rgba(20, 56, 78, .2); }
+.citySuggestions button, .locationSuggestions button { display: block; width: 100%; padding: 9px 10px; border: 0; border-bottom: 1px solid #edf3f5; color: #334e68; background: #fff; cursor: pointer; font: inherit; font-size: .78rem; text-align: left; }
+.citySuggestions button:hover, .locationSuggestions button:hover { background: #eaf5f5; color: var(--ocean); }
 .detailFieldWide { grid-column: 1 / -1; }
 .detailHint { grid-column: 1 / -1; margin: 0; color: #627d98; font-size: .82rem; line-height: 1.45; }
 .connectionToggle, .rentalToggle { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #334e68; font-size: .82rem; font-weight: 700; }
@@ -107,6 +145,11 @@
 .TripForm input, .TripForm select, .TripForm textarea {
   width: 100%; min-height: 43px; padding: 10px 12px; border: 1px solid #cbdde8; border-radius: 10px;
   outline: none; color: var(--ink); background: rgba(255, 255, 255, 0.9); font-size: 0.82rem; transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.TripForm .carMetricDistance input, .TripForm .carMetricDuration input, .TripForm .carMetricSpeed input {
+  color: #829ab1;
+  background: rgba(222, 235, 240, .9);
+  cursor: not-allowed;
 }
 .TripForm .connectionToggle input, .TripForm .rentalToggle input {
   flex: 0 0 18px; width: 18px; min-width: 18px; height: 18px; min-height: 18px; padding: 0;
