@@ -339,26 +339,61 @@
   }
   .tripDates {
     top: 11px;
-    right: 19px;
-    left: calc(60% + 12px);
+    right: 32px;
+    left: calc(60% + 5px);
     justify-content: center;
-    font-size: 16px;
+    gap: 3px;
+    font-size: 8px !important;
+    letter-spacing: 0;
+    white-space: nowrap;
     line-height: 1.25;
   }
   .tripCardActions {
     top: 40px;
-    right: 19px;
+    right: 32px;
     bottom: 7px;
-    left: calc(60% + 12px);
+    left: calc(60% + 5px);
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
   }
   .tripViewButton,
   .tripEditButton {
     width: 100%;
     height: auto;
-    font-size: 0.64rem;
+    min-height: 20px;
+    font-size: 0.56rem;
+    letter-spacing: 0.04em;
   }
+}
+
+@media (max-width: 299px) {
+  .myTripsItem::before,
+  .pastTripItem::before { width: 39px; }
+  .cardDivider { left: 54%; }
+  .tripCardContent { left: 54px; right: 46%; }
+  .MyTrips .tripDates,
+  .MyTrips .tripCardActions {
+    right: 48px !important;
+    width: 64px !important;
+  }
+  .tripCardContent .tripName {
+    font-size: clamp(11px, 4.2vw, 13px);
+    letter-spacing: 0.03em;
+    transform: translateX(-1px);
+  }
+}
+
+@media (max-width: 299px) {
+  .MyTrips .tripDates,
+  .MyTrips .tripCardActions {
+    right: 32px !important;
+    width: 70px !important;
+  }
+}
+
+
+@media (min-width: 350px) and (max-width: 500px) {
+  .cardDivider { left: 64%; }
 }
 
 @media (min-width: 501px) {
@@ -376,7 +411,7 @@
     font-size: 0.9rem;
   }
   .tripCardActions {
-    right: 36px;
+    right: 32px;
     left: calc(65.5% + 12px);
     top: 36px;
     bottom: 7px;
@@ -400,5 +435,150 @@
     padding: 0 3px;
     font-size: clamp(13px, 4.35vw, 16px);
     text-align: center;
+  }
+}
+
+@media (max-width: 349px) {
+  .myTripsItem::before,
+  .pastTripItem::before { width: 50px; }
+  .tripCardContent {
+    left: 64px;
+    right: 40%;
+    transform: none;
+  }
+  .tripCardContent .tripName {
+    transform: none;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 299px) {
+  .myTripsItem::before,
+  .pastTripItem::before { width: 39px; }
+  .cardDivider { left: 54%; }
+  .tripCardContent {
+    left: 54px;
+    right: 46%;
+  }
+  .MyTrips .tripDates {
+    right: 40px !important;
+    width: 64px !important;
+  }
+  .MyTrips .tripCardActions {
+    right: 40px !important;
+    width: 64px !important;
+  }
+  .tripCardContent .tripName {
+    font-size: clamp(11px, 4.2vw, 13px);
+    letter-spacing: 0.03em;
+  }
+}
+
+@media (max-width: 400px) {
+  .tripDates {
+    top: 9px;
+    right: 32px;
+    left: auto;
+    width: 70px;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "start arrow"
+      "end end";
+    justify-content: center;
+    align-content: center;
+    column-gap: 3px;
+    row-gap: 0;
+    font-size: 14px !important;
+    line-height: 1.05;
+  }
+  .tripDateStart {
+    grid-area: start;
+  }
+  .tripDates i {
+    grid-area: arrow;
+    align-self: center;
+    font-size: 0.48rem;
+  }
+  .tripDateEnd {
+    grid-area: end;
+    justify-self: center;
+  }
+  .tripCardActions {
+    right: 32px;
+    left: auto;
+    width: 70px;
+    top: 43px;
+    bottom: 7px;
+  }
+  .tripViewButton,
+  .tripEditButton {
+    min-height: 19px;
+    font-size: 0.54rem;
+  }
+  .myTripsHeaderButton {
+    min-height: 38px;
+    margin-bottom: 14px;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Final mobile override: keep the dates and actions clear of the barcode. */
+@media (max-width: 500px) {
+  .MyTrips .tripDates {
+    top: 9px;
+    right: 32px !important;
+    left: auto !important;
+    width: 70px !important;
+    display: grid !important;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "start arrow"
+      "end end";
+    justify-content: center;
+    align-content: center;
+    column-gap: 3px;
+    row-gap: 0;
+    font-size: 14px !important;
+    line-height: 1.05;
+    white-space: normal;
+  }
+  .MyTrips .tripDateStart {
+    grid-area: start;
+  }
+  .MyTrips .tripDates i {
+    grid-area: arrow;
+    align-self: center;
+    font-size: 0.48rem;
+  }
+  .MyTrips .tripDateEnd {
+    grid-area: end;
+    justify-self: center;
+  }
+  .MyTrips .tripCardActions {
+    right: 32px !important;
+    left: auto !important;
+    width: 70px !important;
+    top: 43px;
+  }
+}
+
+@media (max-width: 299px) {
+  .myTripsItem::before,
+  .pastTripItem::before { width: 39px; }
+  .cardDivider { left: 54%; }
+  .tripCardContent { left: 54px; right: 46%; }
+  .MyTrips .tripDates,
+  .MyTrips .tripCardActions {
+    right: 40px !important;
+    width: 64px !important;
+  }
+  .tripCardContent .tripName {
+    font-size: clamp(11px, 4.2vw, 13px);
+    letter-spacing: 0.03em;
   }
 }

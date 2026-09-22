@@ -95,3 +95,13 @@ button {
     width: 68px;
   }
 }
+
+@media (max-width: 400px) {
+  .appLogoLink {
+    top: 12px;
+    right: -12px;
+  }
+  .logo2 {
+    width: 54px;
+  }
+}
