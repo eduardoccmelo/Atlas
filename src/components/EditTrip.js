@@ -188,6 +188,7 @@ export default function EditTrip() {
         inputDestinationName={inputDestinationName}
         setInputDestinationName={setInputDestinationName}
         setDestinationCoordinates={setDestinationCoordinates}
+        destinationCoordinates={destinationCoordinates}
         inputTripStart={inputTripStart}
         setInputTripStart={setInputTripStart}
         inputTripEnd={inputTripEnd}

@@ -28,12 +28,16 @@ export default function LocationAutocomplete({
   mode = "address",
   queryPrefix = "",
   types,
+  proximity,
   id,
   required = false,
   selectionMode = "label",
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+  const proximityQuery = Array.isArray(proximity) && proximity.length === 2
+    ? `&proximity=${proximity.join(",")}`
+    : "";
 
   useEffect(() => {
     const query = value.trim();
@@ -51,11 +55,13 @@ export default function LocationAutocomplete({
           ? "https://api.mapbox.com/search/geocode/v6/forward?q=" +
             encodeURIComponent(searchText) +
             "&types=address,street,place,locality&limit=6&access_token=" +
-            token
+            token +
+            proximityQuery
           : "https://api.mapbox.com/search/searchbox/v1/forward?q=" +
             encodeURIComponent(searchText) +
             "&limit=6" +
             (types ? "&types=" + encodeURIComponent(types) : "") +
+            proximityQuery +
             "&access_token=" +
             token;
 
@@ -90,7 +96,7 @@ export default function LocationAutocomplete({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [isOpen, mode, queryPrefix, types, value]);
+  }, [isOpen, mode, proximityQuery, queryPrefix, types, value]);
 
   return (
     <div className="locationAutocomplete">

@@ -264,7 +264,17 @@ export function initializeDemoData() {
     }
   }
 
-  if (localStorage.getItem("markerData") === null) {
+  try {
+    const storedMarkers = JSON.parse(localStorage.getItem("markerData") || "[]");
+    const currentMarkers = Array.isArray(storedMarkers) ? storedMarkers : [];
+    const mergedMarkers = [...currentMarkers];
+    demoMarkers.forEach((marker) => {
+      if (!mergedMarkers.some((item) => item?.name === marker.name)) mergedMarkers.push(marker);
+    });
+    if (mergedMarkers.length !== currentMarkers.length || localStorage.getItem("markerData") === null) {
+      localStorage.setItem("markerData", JSON.stringify(mergedMarkers));
+    }
+  } catch {
     localStorage.setItem("markerData", JSON.stringify(demoMarkers));
   }
 }

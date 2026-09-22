@@ -5,6 +5,7 @@ import { getSingleTripFromLocalStorage } from "../services/myTripsStorage";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import TripLocationsMap from "./TripLocationsMap";
+import { useTranslation } from "../i18n";
 
 function formatDate(date) {
   if (!date) return "Not added";
@@ -118,9 +119,11 @@ function AccommodationEntry({ stay, index }) {
         </div>
       </div>
       <div className="tripInfoGrid">
-        <InfoItem label="TYPE" empty={!stay.type}>
-          {stay.type || "Not added"}
-        </InfoItem>
+        {!isOtherAccommodation && (
+          <InfoItem label="TYPE" empty={!stay.type}>
+            {stay.type || "Not added"}
+          </InfoItem>
+        )}
         {(!isOtherAccommodation || stay.provider) && (
           <InfoItem label="PROVIDER" empty={!stay.provider}>
             {stay.provider || "Not added"}
@@ -153,6 +156,7 @@ function AccommodationEntry({ stay, index }) {
 }
 
 export default function Trip() {
+  const { t } = useTranslation();
   const history = useHistory();
   const [singleTrip, setSingleTrip] = useState();
   const [countryFlag, setCountryFlag] = useState("");
@@ -223,7 +227,7 @@ export default function Trip() {
   return (
     <div className="TripDetails">
       <div className="tripDetailsHeader">
-        <h2>TRIP DETAILS</h2>
+        <h2>{t("TRIP DETAILS")}</h2>
       </div>
       <div className="tripDetailsTitle">
         <span>{String(singleTrip.name || "").split(" — ")[0]}</span>
@@ -250,7 +254,7 @@ export default function Trip() {
           </div>
         </section>
 
-        <Section icon="fa-route" title="Transport" count={transportLegs.length}>
+        <Section icon="fa-route" title={t("Transport")} count={transportLegs.length}>
           {transportLegs.length ? (
             <div className="tripEntryCollection">
               {transportLegs.map((leg, index) => (
@@ -258,7 +262,7 @@ export default function Trip() {
               ))}
             </div>
           ) : (
-            <p className="tripEmptyState">No transport has been added yet.</p>
+            <p className="tripEmptyState">{t("No transport has been added yet.")}</p>
           )}
           {singleTrip.carRental?.enabled && (
             <article className="tripEntryCard tripRentalCard">
@@ -292,7 +296,7 @@ export default function Trip() {
           )}
         </Section>
 
-        <Section icon="fa-bed" title="Accommodation" count={accommodations.length}>
+        <Section icon="fa-bed" title={t("Accommodation")} count={accommodations.length}>
           {accommodations.length ? (
             <div className="tripEntryCollection">
               {accommodations.map((stay, index) => (
@@ -300,28 +304,28 @@ export default function Trip() {
               ))}
             </div>
           ) : (
-            <p className="tripEmptyState">No accommodation has been added yet.</p>
+            <p className="tripEmptyState">{t("No accommodation has been added yet.")}</p>
           )}
         </Section>
 
-        <TripLocationsMap trip={singleTrip} />
-
-        <Section icon="fa-map-pin" title="Plan & expenses">
+        <Section icon="fa-map-pin" title={t("Plan & expenses")}>
           <div className="tripPlanningGrid">
             <div className="tripPlanningCard">
-              <p>SIGHTSEEINGS</p>
+              <p>{t("SIGHTSEEINGS")}</p>
               {sightseeings.length ? (
                 <ul>
                   {sightseeings.map((item, index) => (
-                    <li key={item.sightseeing + "-" + index}>{item.sightseeing}</li>
+                    <li key={item.sightseeing + "-" + index}>
+                      {String(item.sightseeing || "").split(" — ")[0]}
+                    </li>
                   ))}
                 </ul>
               ) : (
-                <span className="tripEmptyText">Not added yet</span>
+                <span className="tripEmptyText">{t("Not added yet")}</span>
               )}
             </div>
             <div className="tripPlanningCard">
-              <p>EXPENSES</p>
+              <p>{t("EXPENSES")}</p>
               {expenses.length ? (
                 <div className="tripExpenseList">
                   {expenses.map((expense, index) => (
@@ -337,28 +341,30 @@ export default function Trip() {
                   </b>
                 </div>
               ) : (
-                <span className="tripEmptyText">Not added yet</span>
+                <span className="tripEmptyText">{t("Not added yet")}</span>
               )}
             </div>
           </div>
         </Section>
 
-        <Section icon="fa-sticky-note" title="Notes">
+        <TripLocationsMap trip={singleTrip} />
+
+        <Section icon="fa-sticky-note" title={t("Notes")}>
           <div className={"tripNotes" + (notes.length ? "" : " isEmpty")}>
-            {notes.length ? notes.join(" ") : "No notes have been added yet."}
+            {notes.length ? notes.join(" ") : t("No notes have been added yet.")}
           </div>
         </Section>
       </motion.div>
 
       <div className="tripDetailsFooter">
         <Link className="editLink" to={"/myTrips/" + singleTrip.id + "/edit"}>
-          <button className="editTripButton">Edit trip</button>
+          <button className="editTripButton">{t("Edit trip")}</button>
         </Link>
         <button
           className="editTripCancelButton"
           onClick={() => history.push("/myTrips")}
         >
-          Back to trips
+          {t("Back to trips")}
         </button>
       </div>
     </div>

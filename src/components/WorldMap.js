@@ -8,8 +8,26 @@ import {
 } from "../services/myMarkersStorage";
 import TravelMap from "./TravelMap";
 import CountryOption from "./CountryOption";
+import { useTranslation } from "../i18n";
+
+function mapViewportSize() {
+  const stacked = window.innerWidth <= 800;
+  const mediumStacked = window.innerWidth > 640 && stacked;
+  const mapHeight = stacked
+    ? Math.max(
+        mediumStacked ? 320 : 340,
+        Math.min(mediumStacked ? 390 : 430, window.innerHeight - (mediumStacked ? 410 : 380)),
+      )
+    : Math.max(420, window.innerHeight - 300);
+  return {
+    width: Math.min(920, window.innerWidth - (stacked ? 32 : 48)),
+    height: mapHeight,
+    listHeight: stacked ? 170 : mapHeight,
+  };
+}
 
 export default function WorldMap() {
+  const { t, language } = useTranslation();
   const [countries, setCountries] = useState([]);
   const [isLoadingCountries, setIsLoadingCountries] = useState(true);
   const [countriesError, setCountriesError] = useState("");
@@ -22,14 +40,13 @@ export default function WorldMap() {
     ? (markers.length / countries.length) * 100
     : 0;
 
-  const isMobile = window.innerWidth <= 640;
+  const isStacked = window.innerWidth <= 800;
 
   const [viewPort, setViewPort] = useState({
-    latitude: isMobile ? 39.5 : 20.123,
-    longitude: isMobile ? 20 : 10.123,
-    width: "100%",
-    height: isMobile ? "210px" : "420px",
-    zoom: isMobile ? 1.0 : 0.5,
+    latitude: isStacked ? 39.5 : 20.123,
+    longitude: isStacked ? 20 : 10.123,
+    ...mapViewportSize(),
+    zoom: isStacked ? 0.7 : 1.15,
   });
 
   const filteredCountries = countries.filter((country) =>
@@ -59,7 +76,10 @@ export default function WorldMap() {
           )
           .map((country) => ({
             id: country.cca2 || country.name.common,
-            name: country.name.common,
+            name: language === "pt"
+              ? country.translations?.por?.common || country.name.common
+              : country.name.common,
+            markerName: country.name.common,
             latlng: country.latlng,
             flag: country.cca2
               ? `https://flagcdn.com/w40/${country.cca2.toLowerCase()}.png`
@@ -76,7 +96,7 @@ export default function WorldMap() {
       .finally(() => setIsLoadingCountries(false));
 
     return () => controller.abort();
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     const uniqueMarkers = getMarkersFromLocalStorage().filter(
@@ -107,8 +127,7 @@ export default function WorldMap() {
     const updateMapSize = () => {
       setViewPort((current) => ({
         ...current,
-        width: "100%",
-        height: window.innerWidth <= 640 ? "210px" : "420px",
+        ...mapViewportSize(),
       }));
     };
 
@@ -129,15 +148,15 @@ export default function WorldMap() {
 
   let textContent;
   if (markers.length === 0) {
-    textContent = "You didn't select any Country yet";
+    textContent = t("You didn't select any Country yet");
   } else if (markers.length === 1) {
-    textContent = `You have visited 1 Country in the World (${Math.round(
-      percentage,
-    )}%)`;
+    textContent = language === "pt"
+      ? `Você visitou 1 país no mundo (${Math.round(percentage)}%)`
+      : `You have visited 1 Country in the World (${Math.round(percentage)}%)`;
   } else {
-    textContent = `You have visited ${markers.length} Countries in the World (${Math.round(
-      percentage,
-    )}%)`;
+    textContent = language === "pt"
+      ? `Você visitou ${markers.length} países no mundo (${Math.round(percentage)}%)`
+      : `You have visited ${markers.length} Countries in the World (${Math.round(percentage)}%)`;
   }
 
   function handleOnName(e) {
@@ -177,60 +196,71 @@ export default function WorldMap() {
   return (
     <div className="TravelMap" id="top">
       <div className="travelMapHeader">
-        <h2>TRAVEL MAP</h2>
+        <h2>{t("TRAVEL MAP")}</h2>
       </div>
 
-      <div className="visitedCountriesCounter">{textContent}</div>
-      <div className="mapboxMap">
-        <TravelMap
-          points={points}
-          markers={markers}
-          mapRef={mapRef}
-          clusters={clusters}
-          supercluster={supercluster}
-          clickedCountry={clickedCountry}
-          setClickedCountry={setClickedCountry}
-          setMapError={setMapError}
-          viewPort={viewPort}
-          setViewPort={setViewPort}
-        />
-      </div>
-      <div className="countryFilter">
-        <label htmlFor="filterInput">COUNTRY NAME</label>
-        <input
-          placeholder="Find a country..."
-          className="filterInput"
-          value={filterInputValue}
-          id="filterInput"
-          onChange={handleOnName}
-        ></input>
-      </div>
+      <div
+        className="worldMapContent"
+        style={{
+          "--world-map-height": `${viewPort.height}px`,
+          "--country-list-height": `${viewPort.listHeight}px`,
+        }}
+      >
+        <div className="visitedCountriesCounter">{textContent}</div>
+        <div className="countryFilter">
+          <label htmlFor="filterInput">{t("COUNTRY NAME")}</label>
+          <input
+            placeholder={t("Find a country...")}
+            className="filterInput"
+            value={filterInputValue}
+            id="filterInput"
+            onChange={handleOnName}
+          ></input>
+        </div>
+        <div className="mapboxMap">
+          <TravelMap
+            points={points}
+            markers={markers}
+            countryNames={Object.fromEntries(countries.map((country) => [country.markerName, country.name]))}
+            language={language}
+            mapRef={mapRef}
+            clusters={clusters}
+            supercluster={supercluster}
+            clickedCountry={clickedCountry}
+            setClickedCountry={setClickedCountry}
+            setMapError={setMapError}
+            viewPort={viewPort}
+            setViewPort={setViewPort}
+          />
+        </div>
 
-      <div className="countryList">
+        <div className="countryList">
         {mapError && (
           <div className="noResults">
             The map could not load. Check the Mapbox token in the .env file.
           </div>
         )}
         {isLoadingCountries && (
-          <div className="noResults">LOADING COUNTRIES…</div>
+          <div className="noResults">{t("LOADING COUNTRIES…")}</div>
         )}
         {countriesError && <div className="noResults">{countriesError}</div>}
         {!isLoadingCountries &&
           !countriesError &&
           filteredCountries.length === 0 && (
             <div className="noResults">
-              <i className="fas fa-exclamation-circle"></i>NO RESULTS
+              <i className="fas fa-exclamation-circle"></i>
+              {t("NO RESULTS")}
             </div>
           )}
 
         {!countriesError &&
           filteredCountries.map((country) => {
-            const { id, name, latlng, flag } = country;
+            const { id, name, markerName, latlng, flag } = country;
             return (
               <CountryOption
                 key={id}
                 name={name}
+                markerName={markerName}
                 latlng={latlng}
                 flag={flag}
                 handleClick={handleClick}
@@ -238,6 +268,7 @@ export default function WorldMap() {
               />
             );
           })}
+        </div>
       </div>
       <div className="travelMapFooter">
         <Link className="myTripsButtonLink" to="/">
@@ -247,7 +278,8 @@ export default function WorldMap() {
         </Link>
         <Link className="myTripsButtonLink" to="/myTrips">
           <button className="myTripsButton">
-            <i className="fas fa-suitcase-rolling"></i>My Trips
+            <i className="fas fa-suitcase-rolling"></i>
+            {t("MY TRIPS")}
           </button>
         </Link>
       </div>

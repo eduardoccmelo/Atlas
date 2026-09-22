@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { getTripsFromLocalStorage } from "../services/myTripsStorage";
 import { AnimatePresence, motion } from "framer-motion";
 import TripCard from "./TripCard";
+import { useTranslation } from "../i18n";
 
 export default function MyTrips() {
+  const { t, language } = useTranslation();
   const [trips, setTrips] = useState([]);
 
   const Item = ({ children }) => (
@@ -26,7 +28,7 @@ export default function MyTrips() {
 
   function handleRemoveTrip(name) {
     const confirmation = window.confirm(
-      "Do you really want to delete your Trip?",
+      language === "pt" ? "Você realmente deseja excluir esta viagem?" : "Do you really want to delete your Trip?",
     );
     if (confirmation === true) {
       removeTripFromLocalStorage(name);
@@ -46,14 +48,10 @@ export default function MyTrips() {
   function renderMyTrips() {
     return trips.map((trip) => {
       const startDay = trip.start.slice(8, 10);
-      const startMonth = new Date(trip.start).toLocaleString("default", {
-        month: "short",
-      });
+      const startMonth = trip.start.slice(5, 7);
       const startYear = trip.start.slice(2, 4);
       const endDay = trip.end.slice(8, 10);
-      const endMonth = new Date(trip.end).toLocaleString("default", {
-        month: "short",
-      });
+      const endMonth = trip.end.slice(5, 7);
       const endYear = trip.end.slice(2, 4);
 
       return (
@@ -79,15 +77,15 @@ export default function MyTrips() {
   return (
     <div className="MyTrips">
       <div className="myTripsHeader">
-        <h2>MY TRIPS</h2>
+        <h2>{t("MY TRIPS")}</h2>
       </div>
       <div className="myTripsMain">
         <Link to="/newTrip" className="myTripsHeaderButton">
           <i className="fas fa-plus"></i>
-          <span>ADD A TRIP</span>
+          <span>{t("ADD A TRIP")}</span>
         </Link>
         {trips.length < 1 && (
-          <p className="noTripsText">You don't have any trips yet</p>
+          <p className="noTripsText">{t("You don't have any trips yet")}</p>
         )}
         <AnimatePresence>{renderMyTrips()}</AnimatePresence>
       </div>
@@ -97,7 +95,7 @@ export default function MyTrips() {
           <i className="fas fa-home"></i>
         </Link>
         <Link to="/worldMap" className="myTripsButtonWorldMap">
-          <i className="fas fa-globe-africa"></i> Travel Map
+          <i className="fas fa-globe-africa"></i> {t("Travel Map")}
         </Link>
       </div>
     </div>

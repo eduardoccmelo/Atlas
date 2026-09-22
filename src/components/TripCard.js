@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import TransportIcon from "./TransportIcon";
 import genericDestinationImage from "../images/earth.png";
+import { useTranslation } from "../i18n";
 
 const destinationImageCache = new Map();
 
@@ -37,6 +38,7 @@ export default function TripCard({
   endDate,
   endYear,
 }) {
+  const { t } = useTranslation();
   const [destinationImage, setDestinationImage] = useState(genericDestinationImage);
 
   useEffect(() => {
@@ -99,10 +101,10 @@ export default function TripCard({
       />
       <div className="tripCardActions">
         <Link to={`/myTrips/${id}`}>
-          <button className="tripViewButton">View</button>
+          <button className="tripViewButton">{t("View")}</button>
         </Link>
         <Link to={`/myTrips/${id}/edit`}>
-          <button className="tripEditButton">Edit</button>
+          <button className="tripEditButton">{t("Edit")}</button>
         </Link>
       </div>
       <div className="barcode">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMapGl, { Layer, Marker, NavigationControl, Popup, Source } from "react-map-gl";
 import airports from "airports";
+import { useTranslation } from "../i18n";
 
 function airportCoordinates(value) {
   const code = String(value || "").toUpperCase().match(/\b[A-Z]{3}\b/)?.[0];
@@ -85,7 +86,20 @@ function focusMapOnPoints(map, points) {
   return { longitude: center.lng, latitude: center.lat, zoom: map.getZoom() };
 }
 
+function applyMapLanguage(map, language) {
+  map.getStyle().layers
+    .filter((layer) => layer.type === "symbol" && layer.layout?.["text-field"])
+    .forEach((layer) => {
+      try {
+        map.setLayoutProperty(layer.id, "text-field", ["coalesce", ["get", language === "pt" ? "name_pt" : "name_en"], ["get", "name"]]);
+      } catch (_) {
+        // Keep style layers that do not expose localized label fields.
+      }
+    });
+}
+
 export default function TripLocationsMap({ trip }) {
+  const { t, language } = useTranslation();
   const [locations] = useState(() => locationsForTrip(trip));
   const [selected, setSelected] = useState(null);
   const mapRef = useRef(null);
@@ -160,6 +174,11 @@ export default function TripLocationsMap({ trip }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const map = mapRef.current?.getMap?.();
+    if (map?.isStyleLoaded()) applyMapLanguage(map, language);
+  }, [language]);
+
   if (!viewportPoints.length || !process.env.REACT_APP_MAPBOX_KEY) return null;
 
   return (
@@ -170,7 +189,7 @@ export default function TripLocationsMap({ trip }) {
         </span>
         <div>
           <p className="tripDetailSectionEyebrow">TRIP PLAN</p>
-          <h3>Places on this trip</h3>
+          <h3>{t("Places on this trip")}</h3>
         </div>
       </div>
       <div className="tripLocationMapCanvas" ref={mapCanvasRef}>
@@ -189,6 +208,7 @@ export default function TripLocationsMap({ trip }) {
             }))
           }
           onLoad={(event) => {
+            applyMapLanguage(event.target, language);
             const focusedViewport = focusMapOnPoints(event.target, viewportPoints);
             if (focusedViewport) {
               setViewPort((currentViewport) => ({ ...currentViewport, ...focusedViewport }));
@@ -248,7 +268,7 @@ export default function TripLocationsMap({ trip }) {
         </ReactMapGl>
       </div>
       <p className="tripLocationMapHint">
-        Only confirmed autocomplete selections are shown on the map.
+        {t("Only confirmed autocomplete selections are shown on the map.")}
       </p>
     </section>
   );

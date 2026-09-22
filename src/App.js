@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useLocation } from "react-router-dom";
 
 import Home from "./components/Home";
 import EditTrip from "./components/EditTrip";
@@ -10,15 +10,18 @@ import WorldMap from "./components/WorldMap";
 import Logo from "./components/Logo";
 import PageNotFound from "./components/PageNotFound";
 import { initializeDemoData } from "./services/seedData";
+import { LanguageProvider, LanguageSwitcher, useTranslation } from "./i18n";
 
-function App() {
-  initializeDemoData();
+function AppContent() {
+  const location = useLocation();
+  const isLandingPage = location.pathname === "/";
+  const isWorldMapPage = location.pathname === "/worldMap";
 
   return (
-    <Router>
       <div className="App">
         <header className="header"></header>
-        <main className="main">
+        <LanguageSwitcher className={isLandingPage ? "languageSwitcherLanding" : "languageSwitcherApp"} />
+        <main className={`main${isWorldMapPage ? " mainWorldMap" : ""}`}>
           <Switch>
             <Route exact path="/">
               <Home />
@@ -50,8 +53,17 @@ function App() {
           </Switch>
         </main>
       </div>
-    </Router>
   );
+}
+
+function App() {
+  initializeDemoData();
+  return <LanguageProvider><LocalizedRouter /></LanguageProvider>;
+}
+
+function LocalizedRouter() {
+  const { language } = useTranslation();
+  return <Router key={language}><AppContent /></Router>;
 }
 
 export default App;

@@ -129,6 +129,7 @@ export default function Form({
   inputDestinationName,
   setInputDestinationName,
   setDestinationCoordinates,
+  destinationCoordinates,
   inputTripStart,
   setInputTripStart,
   inputTripEnd,
@@ -1552,6 +1553,8 @@ export default function Form({
             <LocationAutocomplete
               mode="poi"
               types="poi"
+              proximity={destinationCoordinates}
+              selectionMode="name"
               value={inputSightseeing}
               placeholder="New Sightseeing"
               onChange={(value) => {

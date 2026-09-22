@@ -115,6 +115,7 @@ export default function NewTrip() {
         inputDestinationName={inputDestinationName}
         setInputDestinationName={setInputDestinationName}
         setDestinationCoordinates={setDestinationCoordinates}
+        destinationCoordinates={destinationCoordinates}
         inputTripStart={inputTripStart}
         setInputTripStart={setInputTripStart}
         inputTripEnd={inputTripEnd}

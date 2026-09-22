@@ -1,5 +1,6 @@
 export default function CountryOption({
   name,
+  markerName,
   latlng,
   flag,
   handleClick,
@@ -8,11 +9,11 @@ export default function CountryOption({
   return (
     <div className="countryName">
       <input
-        onChange={(e) => handleClick(e, latlng, name)}
+        onChange={(e) => handleClick(e, latlng, markerName || name)}
         className="checkbox"
         type="checkbox"
         value={name}
-        checked={getCheckboxState(name)}
+        checked={getCheckboxState(markerName || name)}
       ></input>
 
       <span>
