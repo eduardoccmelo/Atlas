@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMapGl, { Layer, Marker, NavigationControl, Popup, Source } from "react-map-gl";
 import airports from "airports";
 
@@ -88,6 +88,8 @@ function focusMapOnPoints(map, points) {
 export default function TripLocationsMap({ trip }) {
   const [locations] = useState(() => locationsForTrip(trip));
   const [selected, setSelected] = useState(null);
+  const mapRef = useRef(null);
+  const mapCanvasRef = useRef(null);
   const carLegs = (trip.transportLegs || []).filter((leg) => {
     const points = [
       ...(leg.departureLocationCoordinates || []),
@@ -146,6 +148,18 @@ export default function TripLocationsMap({ trip }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [carRouteKey]);
 
+  useEffect(() => {
+    const canvas = mapCanvasRef.current;
+    if (!canvas) return undefined;
+
+    const resizeMap = () => mapRef.current?.getMap?.().resize();
+    const observer = new ResizeObserver(resizeMap);
+    observer.observe(canvas);
+    resizeMap();
+
+    return () => observer.disconnect();
+  }, []);
+
   if (!viewportPoints.length || !process.env.REACT_APP_MAPBOX_KEY) return null;
 
   return (
@@ -159,13 +173,21 @@ export default function TripLocationsMap({ trip }) {
           <h3>Places on this trip</h3>
         </div>
       </div>
-      <div className="tripLocationMapCanvas">
+      <div className="tripLocationMapCanvas" ref={mapCanvasRef}>
         <ReactMapGl
+          ref={mapRef}
           {...viewPort}
           maxZoom={15}
           mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_KEY}
           mapStyle="mapbox://styles/mapbox/outdoors-v12"
-          onViewportChange={setViewPort}
+          onViewportChange={({ longitude, latitude, zoom }) =>
+            setViewPort((currentViewport) => ({
+              ...currentViewport,
+              longitude,
+              latitude,
+              zoom,
+            }))
+          }
           onLoad={(event) => {
             const focusedViewport = focusMapOnPoints(event.target, viewportPoints);
             if (focusedViewport) {
@@ -203,7 +225,7 @@ export default function TripLocationsMap({ trip }) {
             >
               <button
                 type="button"
-                className="tripLocationPin"
+                className={`tripLocationPin tripLocationPin--${location.type}`}
                 onClick={() => setSelected(location)}
                 aria-label={location.label}
               >

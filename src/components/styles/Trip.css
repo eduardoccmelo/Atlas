@@ -322,6 +322,18 @@
   cursor: pointer;
   transform: rotate(-45deg);
 }
+.tripLocationPin--sightseeing {
+  background: var(--teal);
+}
+.tripLocationPin--plane,
+.tripLocationPin--train,
+.tripLocationPin--bus,
+.tripLocationPin--car {
+  background: #123d5a;
+}
+.tripLocationPin--accommodation {
+  background: #a66a00;
+}
 .tripLocationPin i {
   transform: rotate(45deg);
 }
