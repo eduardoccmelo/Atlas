@@ -254,9 +254,6 @@
     height: var(--country-list-height);
   }
 }
-@media (max-width: 640px) {
-  .TravelMap { width: 100%; }
-}
 @media (max-width: 520px) {
   .myTripsButton {
     width: 48px;

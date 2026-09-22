@@ -57,7 +57,9 @@ export default function TravelMap({ viewPort, setViewPort, mapRef, markers, coun
       applyMapLanguage(map, language);
     });
     map.on("moveend", () => { const center = map.getCenter(); setViewPort((current) => ({ ...current, longitude: center.lng, latitude: center.lat, zoom: map.getZoom() })); });
-    return () => { if (mapRef) mapRef.current = undefined; map.remove(); };
+    const resizeObserver = new ResizeObserver(() => map.resize());
+    resizeObserver.observe(containerRef.current);
+    return () => { if (mapRef) mapRef.current = undefined; resizeObserver.disconnect(); map.remove(); };
   // The Mapbox instance is intentionally created once.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

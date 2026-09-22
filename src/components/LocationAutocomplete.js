@@ -111,10 +111,10 @@ export default function LocationAutocomplete({
       />
       {isOpen && suggestions.length > 0 && (
         <div className="locationSuggestions" role="listbox">
-          {suggestions.map((suggestion) => (
+          {suggestions.map((suggestion, index) => (
             <button
               type="button"
-              key={suggestion.label + suggestion.coordinates.join("-")}
+              key={`${suggestion.label}-${suggestion.coordinates.join("-")}-${index}`}
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => {
                 const selectedLabel =

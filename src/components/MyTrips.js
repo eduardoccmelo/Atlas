@@ -46,7 +46,7 @@ export default function MyTrips() {
   }
 
   function renderMyTrips() {
-    return trips.map((trip) => {
+    return trips.map((trip, index) => {
       const startDay = trip.start.slice(8, 10);
       const startMonth = trip.start.slice(5, 7);
       const startYear = trip.start.slice(2, 4);
@@ -55,7 +55,7 @@ export default function MyTrips() {
       const endYear = trip.end.slice(2, 4);
 
       return (
-        <Item key={trip.id}>
+        <Item key={`${trip.id || "trip"}-${index}`}>
           <TripCard
             handleRemoveTrip={handleRemoveTrip}
             name={trip.name}

@@ -258,7 +258,7 @@ export default function Trip() {
           {transportLegs.length ? (
             <div className="tripEntryCollection">
               {transportLegs.map((leg, index) => (
-                <TransportEntry key={leg.id || index} leg={leg} index={index} />
+                <TransportEntry key={`${leg.id || "transport"}-${index}`} leg={leg} index={index} />
               ))}
             </div>
           ) : (
@@ -300,7 +300,7 @@ export default function Trip() {
           {accommodations.length ? (
             <div className="tripEntryCollection">
               {accommodations.map((stay, index) => (
-                <AccommodationEntry key={stay.id || index} stay={stay} index={index} />
+                <AccommodationEntry key={`${stay.id || "accommodation"}-${index}`} stay={stay} index={index} />
               ))}
             </div>
           ) : (

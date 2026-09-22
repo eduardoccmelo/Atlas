@@ -12,17 +12,11 @@ import { useTranslation } from "../i18n";
 
 function mapViewportSize() {
   const stacked = window.innerWidth <= 800;
-  const mediumStacked = window.innerWidth > 640 && stacked;
-  const mapHeight = stacked
-    ? Math.max(
-        mediumStacked ? 320 : 340,
-        Math.min(mediumStacked ? 390 : 430, window.innerHeight - (mediumStacked ? 410 : 380)),
-      )
-    : Math.max(420, window.innerHeight - 300);
+  const mapHeight = stacked ? 320 : Math.max(420, window.innerHeight - 300);
   return {
     width: Math.min(920, window.innerWidth - (stacked ? 32 : 48)),
     height: mapHeight,
-    listHeight: stacked ? 170 : mapHeight,
+    listHeight: stacked ? 220 : mapHeight,
   };
 }
 
@@ -131,6 +125,7 @@ export default function WorldMap() {
       }));
     };
 
+    updateMapSize();
     window.addEventListener("resize", updateMapSize);
     return () => window.removeEventListener("resize", updateMapSize);
   }, []);

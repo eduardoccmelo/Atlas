@@ -637,10 +637,10 @@ export default function Form({
           activeCityField === fieldId &&
           cityOptions.length > 0 && (
             <div className="citySuggestions" role="listbox">
-              {cityOptions.map((city) => (
+              {cityOptions.map((city, cityIndex) => (
                 <button
                   type="button"
-                  key={`${city.name}-${city.coordinates?.join("-")}`}
+                  key={`${city.name}-${city.coordinates?.join("-")}-${cityIndex}`}
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => {
                     updateTransportLocation(
@@ -685,11 +685,11 @@ export default function Form({
     );
   }
   function renderSightseeings() {
-    const listOfSightseeings = allSightseeings.map((sightSeeing) => {
+    const listOfSightseeings = allSightseeings.map((sightSeeing, index) => {
       return (
         <SightSeeings
           name={sightSeeing.sightseeing}
-          key={sightSeeing.sightseeing}
+          key={`${sightSeeing.sightseeing}-${index}`}
           onClickToRemove={handleToRemove}
         />
       );
@@ -698,12 +698,12 @@ export default function Form({
   }
 
   function renderExpenses() {
-    const listOfExpenses = allExpenses.map((expense) => {
+    const listOfExpenses = allExpenses.map((expense, index) => {
       return (
         <Expense
           name={expense.name}
           value={expense.value}
-          key={expense.name + expense.value}
+          key={`${expense.name}-${expense.value}-${index}`}
           onClickExpenseRemove={handleRemoveExpense}
           currency={currency}
         />
@@ -735,18 +735,18 @@ export default function Form({
   return (
     <form className="TripForm" onSubmit={submitTrip}>
       <datalist id="atlas-airports">
-        {airportOptions.map((airport) => (
+        {airportOptions.map((airport, index) => (
           <option
-            key={airport.iata}
+            key={`${airport.iata}-${airport.icao || "unknown"}-${index}`}
             value={`${airport.iata} — ${airport.displayName}`}
             label={`${airport.displayName}, ${airport.iso}`}
           />
         ))}
       </datalist>
       <datalist id="atlas-cities">
-        {cityOptions.map((city) => (
+        {cityOptions.map((city, cityIndex) => (
           <option
-            key={`${city.name}-${city.coordinates?.join("-")}`}
+            key={`${city.name}-${city.coordinates?.join("-")}-${cityIndex}`}
             value={city.name}
           />
         ))}
@@ -802,7 +802,7 @@ export default function Form({
         {transportLegs.length > 0 && (
           <div className="detailCollection">
             {transportLegs.map((leg, index) => (
-              <div className="detailCard" key={leg.id}>
+              <div className="detailCard" key={`${leg.id || "transport"}-${index}`}>
                 <div className="detailCardHeader">
                   <div className="transportDetailTitle">
                     <span className="transportTypeIcon" aria-hidden="true">
@@ -1388,7 +1388,7 @@ export default function Form({
         {accommodations.length > 0 && (
           <div className="detailCollection">
             {accommodations.map((stay, index) => (
-              <div className="detailCard" key={stay.id}>
+              <div className="detailCard" key={`${stay.id || "accommodation"}-${index}`}>
                 <div className="detailCardHeader">
                   <strong>STAY {index + 1}</strong>
                   <button
